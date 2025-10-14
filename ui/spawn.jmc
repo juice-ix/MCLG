@@ -1,0 +1,146 @@
+function spawn_ui () {
+    // Kill the block display and interactions
+    kill 0001b3fd-0001-d598-0001-60c20000f5bd;
+    kill @e[type=interaction,distance=..256,tag=lg.uiHitbox];
+
+    //Scale ui size and offset
+    ui::size = 0.25 * (float) $uiSize;
+    if ($uiSize > 24) {
+        ui::z_size = 6.25;
+    } else {
+        ui::z_size = $uiSize;
+    }
+    
+    ui::offset = 0.005 * (float) ui::size * 100;
+
+    //Find the starting corner
+    $uiHitboxOffset = $uiSize;
+    ui::hitboxOffset = 0.125 * (float) $uiHitboxOffset -= 25;
+
+    //Spawn UI Based on yaw
+    $yaw = @s::Rotation[0];
+
+    //Positive Z
+    if ($yaw matches -45..45) {
+        execute rotated ~ 0 positioned ^ ^ ^3 align xyz run {
+            
+            //Summon base block display
+            $summon block_display ~ ~ ~ {UUID:[I;111613,120216,90306,62909],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[-$(offset)f,0f,0f],scale:[$(size)f,$(size)f,$(z_size)f]},block_state:{Name:"minecraft:black_concrete"}};
+            
+            //Summon interaction(s)
+            $if ($uiSize < 26) {summon interaction ~ ~ ~$(offset) {Tags:["lg.uiHitbox"],width:$(size),height:$(size)};} 
+            execute if score $uiSize __variable__ matches 26.. run {
+
+                $max_recur := $uiSize / 25;
+                $execute positioned ~-$(hitboxOffset) ~ ~ run {
+                    for ($i = 0; $i < $max_recur; $i++) {
+                        for ($j = 0; $j < $max_recur; $j++) {
+
+                            //Set the offset to the box's width scaled by 100
+                            $offset_x = 6250;
+                            $offset_y = 6250;
+
+                            //Multiply by the current iteration then summon
+                            ui::hitbox.offset_x = 0.001 * (float) $offset_x *= $i;
+                            ui::hitbox.offset_y = 0.001 * (float) $offset_y *= $j;
+                            execute run {$summon interaction ~$(offset_x) ~$(offset_y) ~3.125 {Tags:["lg.uiHitbox"],width:6.25,height:6.25};} with ui::hitbox;
+                        }
+                    } 
+                } 
+            } with ui::;
+        } with ui::;
+    }
+    
+    //Negative X
+    if ($yaw matches 46..135) {
+        execute rotated ~ 0 positioned ^ ^ ^10 align xyz run {
+            
+            //Summon base block display
+            $summon block_display ~ ~ ~ {UUID:[I;111613,120216,90306,62909],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[-$(offset)f,0f,0f],scale:[$(size)f,$(size)f,$(z_size)f]},block_state:{Name:"minecraft:black_concrete"}};
+            rotate 0001b3fd-0001-d598-0001-60c20000f5bd 90 0;
+            //Summon interaction(s)
+            $if ($uiSize < 26) {summon interaction ~-$(offset) ~ ~ {Tags:["lg.uiHitbox"],width:$(size),height:$(size)};} 
+            execute if score $uiSize __variable__ matches 26.. run {
+
+                $max_recur := $uiSize / 25;
+                $execute positioned ~ ~ ~-$(hitboxOffset) run {
+                    for ($i = 0; $i < $max_recur; $i++) {
+                        for ($j = 0; $j < $max_recur; $j++) {
+
+                            //Set the offset to the box's width scaled by 100
+                            $offset_x = 6250;
+                            $offset_y = 6250;
+
+                            //Multiply by the current iteration then summon
+                            ui::hitbox.offset_x = 0.001 * (float) $offset_x *= $i;
+                            ui::hitbox.offset_y = 0.001 * (float) $offset_y *= $j;
+                            execute run {$summon interaction ~-3.125 ~$(offset_y) ~$(offset_x) {Tags:["lg.uiHitbox"],width:6.25,height:6.25};} with ui::hitbox;
+                        }
+                    } 
+                } 
+            } with ui::;
+        } with ui::;
+    }
+
+    //Negative Z
+    if ($yaw matches -180..-136 || $yaw matches 136..180 ) {
+        execute rotated ~ 0 positioned ^ ^ ^3 align xyz run {
+            
+            //Summon base block display
+            $summon block_display ~ ~ ~ {UUID:[I;111613,120216,90306,62909],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[-$(offset)f,0f,0f],scale:[$(size)f,$(size)f,$(z_size)f]},block_state:{Name:"minecraft:black_concrete"}};
+            rotate 0001b3fd-0001-d598-0001-60c20000f5bd 180 0;
+            //Summon interaction(s)
+            $if ($uiSize < 26) {summon interaction ~ ~ ~-$(offset) {Tags:["lg.uiHitbox"],width:$(size),height:$(size)};} 
+            execute if score $uiSize __variable__ matches 26.. run {
+
+                $max_recur := $uiSize / 25;
+                $execute positioned ~-$(hitboxOffset) ~ ~ run {
+                    for ($i = 0; $i < $max_recur; $i++) {
+                        for ($j = 0; $j < $max_recur; $j++) {
+
+                            //Set the offset to the box's width scaled by 100
+                            $offset_x = 6250;
+                            $offset_y = 6250;
+
+                            //Multiply by the current iteration then summon
+                            ui::hitbox.offset_x = 0.001 * (float) $offset_x *= $i;
+                            ui::hitbox.offset_y = 0.001 * (float) $offset_y *= $j;
+                            execute run {$summon interaction ~$(offset_x) ~$(offset_y) ~-3.125 {Tags:["lg.uiHitbox"],width:6.25,height:6.25};} with ui::hitbox;
+                        }
+                    } 
+                } 
+            } with ui::;
+        } with ui::;
+    }
+    
+    //Positive X
+    if ($yaw matches -135..-46) {
+        execute rotated ~ 0 positioned ^ ^ ^10 align xyz run {
+            
+            //Summon base block display
+            $summon block_display ~ ~ ~ {UUID:[I;111613,120216,90306,62909],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[-$(offset)f,0f,0f],scale:[$(size)f,$(size)f,$(z_size)f]},block_state:{Name:"minecraft:black_concrete"}};
+            rotate 0001b3fd-0001-d598-0001-60c20000f5bd 270 0;
+            //Summon interaction(s)
+            $if ($uiSize < 26) {summon interaction ~-$(offset) ~ ~ {Tags:["lg.uiHitbox"],width:$(size),height:$(size)};} 
+            execute if score $uiSize __variable__ matches 26.. run {
+
+                $max_recur := $uiSize / 25;
+                $execute positioned ~ ~ ~-$(hitboxOffset) run {
+                    for ($i = 0; $i < $max_recur; $i++) {
+                        for ($j = 0; $j < $max_recur; $j++) {
+
+                            //Set the offset to the box's width scaled by 100
+                            $offset_x = 6250;
+                            $offset_y = 6250;
+
+                            //Multiply by the current iteration then summon
+                            ui::hitbox.offset_x = 0.001 * (float) $offset_x *= $i;
+                            ui::hitbox.offset_y = 0.001 * (float) $offset_y *= $j;
+                            execute run {$summon interaction ~3.125 ~$(offset_y) ~$(offset_x) {Tags:["lg.uiHitbox"],width:6.25,height:6.25};} with ui::hitbox;
+                        }
+                    } 
+                } 
+            } with ui::;
+        } with ui::;
+    }
+}

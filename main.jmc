@@ -1,0 +1,14 @@
+import "ui/*";
+
+if ($uiSize > 0) {
+    
+} else {
+    $uiSize = 100;
+}
+
+function  __tick__  () {
+    $uiCheck := $uiSize % 25;
+    if ($uiCheck > 0) {
+        $uiSize := 25 - $uiCheck + $uiSize;
+    }
+}

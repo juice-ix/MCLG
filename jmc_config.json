@@ -1,0 +1,7 @@
+{
+    "namespace": "mclg",
+    "description": "Create 2D Logic Gate Systems",
+    "pack_format": "88",
+    "target": "main.jmc",
+    "output": "build"
+}
