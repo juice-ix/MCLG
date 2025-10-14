@@ -1,0 +1,4 @@
+{
+  "include_files": ["build/*"],
+  "exclude_files": ["*.jmc","*.hjmc","jmc_config.json","project.json"]
+}

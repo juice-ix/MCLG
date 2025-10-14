@@ -1,14 +1,23 @@
 import "ui/*";
 
-if ($uiSize > 0) {
-    
-} else {
-    $uiSize = 100;
+Scoreboard.add(__id__);
+Scoreboard.add(__playerId__);
+
+if (!$uiSize) {
+    $uiSize = 500;
 }
 
 function  __tick__  () {
-    $uiCheck := $uiSize % 25;
+    execute as @a run {
+        if (!__playerId__:@s) {
+            $max = 0;
+            execute as @a run $max > __playerId__:@s;
+            __playerId__:@s := $max + 1;
+        }
+    }
+
+    $uiCheck := $uiSize % 50;
     if ($uiCheck > 0) {
-        $uiSize := 25 - $uiCheck + $uiSize;
+        $uiSize := 50 - $uiCheck + $uiSize;
     }
 }

@@ -1,0 +1,79 @@
+new predicate(matching_id) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__id__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$id"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$id"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
+class zzz_.ui {
+    @add(__tick__)
+    function raycast() {
+        execute as @a at @s run JMC.put("function #bs.view:at_aimed_point {run:'function mclg:zzz_/ui/hit',with:{'max_distance': 50}}");
+    }
+    function hit() {
+
+        $id = __playerId__:@s;
+        if (entity _highlight_) {
+            execute as _highlight_ run {
+                
+                tp @s ~ ~ ~;
+
+                if ($yaw matches -45..45) {tp @s ~ ~ ~-0.125;} 
+                else if ($yaw matches 46..135) {tp @s ~0.25 ~ ~;} 
+                else if ($yaw matches -180..-136 || $yaw matches 136..180) {tp @s ~0.25 ~ ~0.25;} 
+                else {tp @s ~-0.125 ~ ~0.25;}
+
+                ui::highlightPos = @s::Pos;
+                ui::highlightPos[0] = 0.25 * (double) ui::highlightPos[0] * 4;
+                ui::highlightPos[1] = 0.25 * (double) ui::highlightPos[1] * 4;
+                ui::highlightPos[2] = 0.25 * (double) ui::highlightPos[2] * 4;
+                @s::Pos = ui::highlightPos;
+            }
+                
+        } else {
+            summon block_display ~ ~ ~ {Tags:["lg.highlight","lg.temp_highlight"],teleport_duration:1,transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:white_stained_glass"}};
+            execute as @n[tag=lg.temp_highlight] run {
+                __id__:@s = $id;
+                tag @s remove lg.temp_highlight;
+
+                if ($yaw matches -45..45) {
+                    rotate @s 0 0;
+                    tp @s ~0.25 ~ ~-0.125;
+                } else if ($yaw matches 46..135) {
+                    rotate @s 90 0;
+                    tp @s ~0.125 ~ ~0.25;
+                } else if ($yaw matches -180..-136 || $yaw matches 136..180) {
+                    rotate @s 180 0;
+                    tp @s ~0.25 ~ ~0.125;
+                } else {
+                    rotate @s 270 0;
+                    tp @s ~-0.125 ~ ~0.25;
+                }
+
+                ui::highlightPos = @s::Pos;
+                ui::highlightPos[0] = 0.25 * (double) ui::highlightPos[0] * 4;
+                ui::highlightPos[1] = 0.25 * (double) ui::highlightPos[1] * 4;
+                ui::highlightPos[2] = 0.25 * (double) ui::highlightPos[2] * 4;
+                @s::Pos = ui::highlightPos;
+            }   
+        }
+    }
+}

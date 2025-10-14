@@ -1,0 +1,7 @@
+#credit "Made By Juice"
+#credit
+#credit "Socials:"
+#credit "Discord: @juice_ix"
+#credit "YouTube: @juiceix"
+
+#define _highlight_ @n[type = block_display, tag=lg.highlight, predicate = mclg:matching_id]

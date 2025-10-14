@@ -1,0 +1,20 @@
+{
+  "name": "MC Logic Gates",
+  "slug": "mc-logic-gates",
+  "version": "0.1.0",
+  "game_versions": [
+    "1.21.8",
+    "1.21.9"
+  ],
+  "summary": "Create 2D Logic Gate Systems",
+  "license": "GPL-3.0",
+  "categories": [],
+  "additional_categories": [],
+  "dependencies": {
+    "bookshelf-view": "3.1.1"
+  },
+  "dev_dependencies": {},
+  "optional_dependencies": {},
+  "release_type": "release",
+  "dpm_version": "0.1.2"
+}
