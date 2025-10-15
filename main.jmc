@@ -1,11 +1,8 @@
 import "ui/*";
 
-Scoreboard.add(__id__);
 Scoreboard.add(__playerId__);
 
-if (!$uiSize) {
-    $uiSize = 500;
-}
+$uiSize ??= 500;
 
 function  __tick__  () {
     execute as @a run {
