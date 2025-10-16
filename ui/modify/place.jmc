@@ -366,9 +366,9 @@ Scoreboard.add(__pp5__);
 
                     @s::block_state.Name = ui::element_info.item;
                     @s::transformation.scale = [0.25f, 0.25f, 0.25f];
-                    tag @s add lg.fill_placed;
                     JMC.put("function mclg:zzz_/place_fill/$extra");
-                    
+                    tag @s add lg.fill_placed;
+                    execute if entity @s[tag=lg.uiElement] run tag @s remove lg.uiElement;
                 }
             }
         }
