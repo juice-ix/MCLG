@@ -1,0 +1,593 @@
+class wires {
+    new tags.item(rods) {
+    "replace": false,
+        "values": [
+            "minecraft:end_rod",
+            "minecraft:lightning_rod",
+            { "id": "minecraft:waxed_lightning_rod", "required": false },
+            { "id": "minecraft:exposed_lightning_rod", "required": false },
+            { "id": "minecraft:oxidized_lightning_rod", "required": false },
+            { "id": "minecraft:weathered_lightning_rod", "required": false },
+            { "id": "minecraft:waxed_exposed_lightning_rod", "required": false },
+            { "id": "minecraft:waxed_oxidized_lightning_rod", "required": false },
+            { "id": "minecraft:waxed_weathered_lightning_rod", "required": false }
+        ]
+    }
+
+    new tags.item(bulbs) {
+        "replace": false,
+            "values": [
+                "minecraft:copper_bulb",
+                "minecraft:waxed_copper_bulb",
+                "minecraft:exposed_copper_bulb",
+                "minecraft:oxidized_copper_bulb",
+                "minecraft:weathered_copper_bulb",
+                "minecraft:waxed_exposed_copper_bulb",
+                "minecraft:waxed_oxidized_copper_bulb",
+                "minecraft:waxed_weathered_copper_bulb"
+            ]
+    }
+
+    new tags.item(grates) {
+        "replace": false,
+            "values": [
+                "minecraft:copper_grate",
+                "minecraft:waxed_copper_grate",
+                "minecraft:exposed_copper_grate",
+                "minecraft:oxidized_copper_grate",
+                "minecraft:weathered_copper_grate",
+                "minecraft:waxed_exposed_copper_grate",
+                "minecraft:waxed_oxidized_copper_grate",
+                "minecraft:waxed_weathered_copper_grate"
+            ]
+    }
+
+    new tags.item(stairs) {
+        "replace": false,
+            "values": [
+                "minecraft:cut_copper_stairs",
+                "minecraft:waxed_cut_copper_stairs",
+                "minecraft:exposed_cut_copper_stairs",
+                "minecraft:oxidized_cut_copper_stairs",
+                "minecraft:weathered_cut_copper_stairs",
+                "minecraft:waxed_exposed_cut_copper_stairs",
+                "minecraft:waxed_oxidized_cut_copper_stairs",
+                "minecraft:waxed_weathered_cut_copper_stairs"
+            ]
+    }
+
+    new tags.item(modifiable)  {
+        "replace": false,
+            "values": [
+                "minecraft:cut_copper_stairs",
+                "minecraft:waxed_cut_copper_stairs",
+                "minecraft:exposed_cut_copper_stairs",
+                "minecraft:oxidized_cut_copper_stairs",
+                "minecraft:weathered_cut_copper_stairs",
+                "minecraft:waxed_exposed_cut_copper_stairs",
+                "minecraft:waxed_oxidized_cut_copper_stairs",
+                "minecraft:waxed_weathered_cut_copper_stairs",
+
+                "minecraft:end_rod",
+                "minecraft:lightning_rod",
+                { "id": "minecraft:waxed_lightning_rod", "required": false },
+                { "id": "minecraft:exposed_lightning_rod", "required": false },
+                { "id": "minecraft:oxidized_lightning_rod", "required": false },
+                { "id": "minecraft:weathered_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_exposed_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_oxidized_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_weathered_lightning_rod", "required": false }
+            ]
+    }
+
+    new tags.item(special_blocks) {
+        "replace": false,
+            "values": [
+                "minecraft:cut_copper_stairs",
+                "minecraft:waxed_cut_copper_stairs",
+                "minecraft:exposed_cut_copper_stairs",
+                "minecraft:oxidized_cut_copper_stairs",
+                "minecraft:weathered_cut_copper_stairs",
+                "minecraft:waxed_exposed_cut_copper_stairs",
+                "minecraft:waxed_oxidized_cut_copper_stairs",
+                "minecraft:waxed_weathered_cut_copper_stairs",
+
+                "minecraft:end_rod",
+                "minecraft:lightning_rod",
+                { "id": "minecraft:waxed_lightning_rod", "required": false },
+                { "id": "minecraft:exposed_lightning_rod", "required": false },
+                { "id": "minecraft:oxidized_lightning_rod", "required": false },
+                { "id": "minecraft:weathered_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_exposed_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_oxidized_lightning_rod", "required": false },
+                { "id": "minecraft:waxed_weathered_lightning_rod", "required": false },
+
+                "minecraft:copper_grate",
+                "minecraft:waxed_copper_grate",
+                "minecraft:exposed_copper_grate",
+                "minecraft:oxidized_copper_grate",
+                "minecraft:weathered_copper_grate",
+                "minecraft:waxed_exposed_copper_grate",
+                "minecraft:waxed_oxidized_copper_grate",
+                "minecraft:waxed_weathered_copper_grate",
+
+                "minecraft:copper_bulb",
+                "minecraft:waxed_copper_bulb",
+                "minecraft:exposed_copper_bulb",
+                "minecraft:oxidized_copper_bulb",
+                "minecraft:weathered_copper_bulb",
+                "minecraft:waxed_exposed_copper_bulb",
+                "minecraft:waxed_oxidized_copper_bulb",
+                "minecraft:waxed_weathered_copper_bulb",
+
+                "minecraft:sea_lantern",
+                "minecraft:redstone_lamp"
+            ]
+    }
+}
+
+class place_uielement {
+    new advancement(single) {
+        "criteria": {
+            "used_interaction": {
+                "trigger": "minecraft:player_interacted_with_entity",
+                    "conditions": {
+                    "player": [
+                        {
+                            "condition": "minecraft:all_of",
+                            "terms": [
+                                {
+                                    "condition": "minecraft:entity_properties",
+                                    "entity": "this",
+                                    "predicate": {
+                                        "type_specific": {
+                                            "type": "minecraft:player",
+                                            "input": {
+                                                "sprint": false
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "mainhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "offhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                        "entity": {
+                        "type": "minecraft:interaction",
+                        "nbt": "{Tags:[\"lg.uiHitbox\"]}"
+                    }
+                }
+            }
+        },
+        "requirements": [
+            [
+                "used_interaction"
+            ]
+        ],
+            "rewards": {
+            "function": "mclg:zzz_/ui/place/single"
+        }
+    }
+
+    new advancement(fill) {
+        "criteria": {
+            "used_interaction": {
+                "trigger": "minecraft:player_interacted_with_entity",
+                    "conditions": {
+                    "player": [
+                        {
+                            "condition": "minecraft:all_of",
+                            "terms": [
+                                {
+                                    "condition": "minecraft:entity_properties",
+                                    "entity": "this",
+                                    "predicate": {
+                                        "type_specific": {
+                                            "type": "minecraft:player",
+                                            "input": {
+                                                "sprint": true
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "mainhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "offhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                        "entity": {
+                        "type": "minecraft:interaction",
+                        "nbt": "{Tags:[\"lg.uiHitbox\"]}"
+                    }
+                }
+            }
+        },
+        "requirements": [
+            [
+                "used_interaction"
+            ]
+        ],
+            "rewards": {
+            "function": "mclg:zzz_/ui/place/fill"
+        }
+    }
+
+    new predicate(at_current_cell) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+            "__pos0__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$x"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                            "name": "$x"
+                    },
+                    "score": "__variable__"
+                }
+            },
+            "__pos1__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$y"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$y"
+                    },
+                    "score": "__variable__"
+                }
+            },
+            "__pos2__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$z"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$z"
+                    },
+                    "score": "__variable__"
+                }
+            }
+        }
+    }
+}
+
+// Initliaze ui element info
+if (!data storage mclg:ui element_info) {
+        ui:: += {
+        element_info:
+        {
+            rod: {
+                lightning_rod_facing: "up",
+                end_rod_facing: "down",
+                display: "North to South",
+                tags: [
+                    "lg.uiElement",
+                    "lg.can_rotate",
+                    "lg.wire",
+                    "lg.rod",
+                    "lg.nts"
+                ]
+            },
+            stair: {
+                display: "North, West",
+                facing: "west",
+                half: "bottom",
+                tags: [
+                    "lg.can_rotate",
+                    "lg.uiElement",
+                    "lg.stair",
+                    "lg.wire",
+                    "lg.in_n",
+                    "lg.in_w"
+                ]
+            },
+            gate: {
+                orientation: "Vertical",
+                input_block: "minecraft:lime_wool",
+                type: "AND",
+                tags: [
+                    "lg.uiElement",
+                    "lg.AND"
+                ]
+            }
+        }
+    };
+}
+
+Scoreboard.add(__wireId__);
+Scoreboard.add(__gateId__);
+
+Scoreboard.add(__pos0__);
+Scoreboard.add(__pos1__);
+Scoreboard.add(__pos2__);
+
+Scoreboard.add(__cpp__);
+
+Scoreboard.add(__pp0__);
+Scoreboard.add(__pp1__);
+Scoreboard.add(__pp2__);
+Scoreboard.add(__pp3__);
+Scoreboard.add(__pp4__);
+Scoreboard.add(__pp5__);
+
+
+class zzz_.ui.place {
+
+    @lazy function place_fill (extra) {
+
+        // Set the target item to the currently held item
+        ui::element_info.item = @s::SelectedItem.id;
+        $id = __playerId__:@s;
+        for ($x = __pp0__:@s; $x <= __pp3__:@s; $x += 25) {
+            for ($y = __pp1__:@s; $y <= __pp4__:@s; $y += 25) {
+                for ($z = __pp2__:@s; $z <= __pp5__:@s; $z += 25) {
+
+                    // Summon ui element unless there's another one in the current position
+                    if (!entity @e[predicate=mclg:place_uielement/at_current_cell,limit = 2]) {
+                        $fillVolume++;
+                        execute rotated as _highlight_ summon block_display run {
+                            rotate @s ~ ~;
+
+                            @s::Pos[0] = 0.01 * (float) $x;
+                            @s::Pos[1] = 0.01 * (float) $y;
+                            @s::Pos[2] = 0.01 * (float) $z;
+
+                            __pos0__:@s = $x;
+                            __pos1__:@s = $y;
+                            __pos2__:@s = $z;
+
+                            @s::block_state.Name = ui::element_info.item;
+                            @s::transformation.scale = [0.25f, 0.25f, 0.25f];
+                            JMC.put("function mclg:zzz_/ui/place/apply_data/$extra");               
+                        }
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    @lazy function set_wireId() {
+        $max = 0;
+        execute as @e[type=block_display,tag=lg.has_wire_id] run $max > __wireId__:@s;
+        $max++;
+        __wireId__:@s = $max;
+    }
+
+    function apply_data.rod () {
+        @s::Tags = ui::element_info.rod.tags;
+        @s::CustomName = ui::element_info.rod.display;
+        if ($holding_end_rod) {@s::block_state.Properties.facing = ui::element_info.rod.end_rod_facing;}
+        else {@s::block_state.Properties.facing = ui::element_info.rod.lightning_rod_facing;}
+    }
+    function apply_data.stair () {
+        @s::Tags = ui::element_info.stair.tags;
+        @s::CustomName = ui::element_info.stair.display;
+        @s::block_state.Properties.half = ui::element_info.stair.half;
+        @s::block_state.Properties.facing = ui::element_info.stair.facing;
+    }
+    function apply_data.bulb () {
+        tag @s add lg.wire;
+        tag @s add lg.bulb;
+        tag @s add lg.uiElement;
+        @s::CustomName = "Bulb";
+    }
+    function apply_data.grate () {
+        tag @s add lg.wire;
+        tag @s add lg.grate;
+        tag @s add lg.uiElement;
+        @s::CustomName = "Splitter";
+    }
+    function apply_data.buffer () {
+        tag @s add lg.wire;
+        tag @s add lg.buffer;
+        tag @s add lg.has_wire_id;
+        tag @s add lg.uiElement;
+        this.set_wireId();
+
+        @s::CustomName = "Buffer";
+    }
+    function apply_data.general () {
+        tag @s add lg.uiElement;
+    }
+
+    function single() {
+
+        $id = __playerId__:@s;
+        __cpp__:@s = -1;
+        __cbp__:@s = -1;
+        execute at _highlight_ run {
+            if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
+
+                tag @s add lg.placing;
+                execute summon block_display run {
+                    
+                    __pos0__:@s = ui::highlightPos[0] * 100;
+                    __pos1__:@s = ui::highlightPos[1] * 100;
+                    __pos2__:@s = ui::highlightPos[2] * 100;
+
+                    rotate @s ~ ~;
+
+                    @s::block_state.Name = @p[tag=lg.placing]::SelectedItem.id;
+                    @s::transformation.scale = [0.25f, 0.25f, 0.25f];
+
+                    if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/rods) {
+                        $holding_end_rod ?= execute if items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod;
+                        this.apply_data.rod();
+
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/stairs) {
+                        this.apply_data.stair();
+
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/bulbs) {
+                        this.apply_data.bulb();
+
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/grates) {
+                        this.apply_data.grate();
+                        
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:redstone_lamp){
+                        this.apply_data.buffer();
+                    }
+                    else {tag @s add lg.uiElement;}
+                }
+                tag @s remove lg.placing;
+            } 
+        }
+        Advancement.revoke(@s, only, place_uielement/single);
+    }
+
+    function fill() {
+        if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
+
+            __cpp__:@s := (__cpp__:@s + 1) % 3;
+            __cbp__:@s = -1;
+            
+            if (__cpp__:@s = 0) {
+                __pp0__:@s = ui::highlightPos[0] * 100;
+                __pp1__:@s = ui::highlightPos[1] * 100;
+                __pp2__:@s = ui::highlightPos[2] * 100;
+
+                tellraw @s "Set Point 1";
+            } else if (__cpp__:@s = 1) {
+                __pp3__:@s = ui::highlightPos[0] * 100;
+                __pp4__:@s = ui::highlightPos[1] * 100;
+                __pp5__:@s = ui::highlightPos[2] * 100;
+
+                tellraw @s "Set Point 2. Right click to confirm.";
+            } else {
+
+                if (__pp0__:@s > __pp3__:@s) {__pp0__:@s >< __pp3__:@s;}
+                if (__pp1__:@s > __pp4__:@s) {__pp1__:@s >< __pp4__:@s;}
+                if (__pp2__:@s > __pp5__:@s) {__pp2__:@s >< __pp5__:@s;}
+                
+                $fillVolume = 0;
+
+                if (items entity @s weapon.mainhand #mclg:wires/rods) {
+
+                    $holding_end_rod ?= execute if items entity @s weapon.mainhand minecraft:end_rod;
+                    this.place_fill(rod);
+
+                } else if (items entity @s weapon.mainhand #mclg:wires/stairs) {
+                    
+                    this.place_fill(stair);
+
+                } else if (items entity @s weapon.mainhand #mclg:wires/bulbs) {
+                    this.place_fill(bulb);
+
+                } else if (items entity @s weapon.mainhand #mclg:wires/grates) {
+                    this.place_fill(grate);
+                    
+                } else if (items entity @s weapon.mainhand minecraft:redstone_lamp){
+                    this.place_fill(buffer);
+
+                } else {
+                    this.place_fill(general);
+                }
+
+                if ($fillVolume = 1) {printf("\nPlaced &<$fillVolume,italic> &<!italic>element");} 
+                else {printf("\nPlaced &<$fillVolume,italic> &<!italic>elements");}
+            }
+        }
+
+        Advancement.revoke(@s, only, place_uielement/fill);
+    }
+}
+function get_id () {
+    $id = __playerId__:@s;
+    execute at _highlight_ as _highlighted_ run return run scoreboard players get @s __wireId__;
+}

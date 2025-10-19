@@ -1,0 +1,10 @@
+#credit "Made By Juice"
+#credit
+#credit "Socials:"
+#credit "Discord: @juice_ix"
+#credit "YouTube: @juiceix"
+
+#define _highlight_ @n[type = block_display, tag=lg.highlight, predicate = mclg:matching_highlight_id]
+#define _highlighted_ @n[type = block_display, tag=lg.uiElement, distance = ..0.001]
+
+#define _uiElement_ @n[type = block_display, tag=lg.uiElement ,distance = ..0.001]

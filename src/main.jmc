@@ -1,0 +1,18 @@
+import "src/ui/*";
+
+Scoreboard.add(__playerId__);
+
+$uiSize ??= 500;
+
+function  __tick__  () {
+    execute as @a unless score @s __playerId__ matches 1.. run {
+        $max = 0;
+        execute as @a run $max > __playerId__:@s;
+        __playerId__:@s := $max + 1;
+    }
+
+    $uiCheck := $uiSize % 50;
+    if ($uiCheck > 0) {
+        $uiSize := 50 - $uiCheck + $uiSize;
+    }
+}
