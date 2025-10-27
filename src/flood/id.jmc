@@ -1,0 +1,179 @@
+Scoreboard.add(__ticks__);
+Scoreboard.add(__bit1__);
+Scoreboard.add(__bit2__);
+
+new predicate(matching_wire_id) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__wireId__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$wireId"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$wireId"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
+new predicate(matching_gate_id) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__gateId__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$gateId"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$gateId"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
+function id_flood () {
+    $id = __playerId__:@s;
+    execute positioned as _highlight_ run { 
+        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.dirty] remove lg.dirty;
+        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.flooded] remove lg.flooded;
+        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.new_flood] remove lg.new_flood;
+        __ticks__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId] = 0;
+
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,tag=lg.starter,distance=..250] run {
+            tag @s add lg.flooded;
+            $wireId = __wireId__:@s;
+            
+            $bit = @s::block_state.Properties.lit;
+            if ($bit = 4) {$bit = 1;}
+            if ($bit = 5) {$bit = 0;}
+            
+            execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,tag=!lg.flooded,predicate=mclg:matching_wire_id] at @s run {
+                $gateId = __gateId__:@s;
+                
+                execute as @n[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..0.26,predicate=mclg:matching_gate_id] run {
+                    __ticks__:@s++;
+                    if (__ticks__:@s != __ticksNeeded__:@s) {
+                        execute run {
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                        } with [__ticks__:@s];
+
+                    } else {
+                    execute run {
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                            tag @s add lg.new_flood;
+                        } with [__ticks__:@s];
+                    }
+                }
+            }
+            execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.buffer,tag=!lg.flooded,predicate=mclg:matching_wire_id] run {
+                if ($bit = 1) {@s::block_state.Properties.lit = "true";}
+                if ($bit = 0) {@s::block_state.Properties.lit = "false";}
+            }
+        }
+
+        if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=lg.new_flood,distance=..250]) {
+            zzz_.id_flood.promote();
+        }
+    }
+}
+
+function zzz_.id_flood.promote () {
+
+    execute positioned as _highlight_ run { 
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.new_flood,distance=..250] run {
+            tag @s remove lg.new_flood;
+            tag @s add lg.flooded;
+            $wireId = __wireId__:@s;
+
+            switch (__gateType__:@s) {
+                // Two Input AND gate
+                case 0:
+                    debug("AND");
+                    debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}]);
+                    debug(["Bit 2: ", {"score":{"name":"@s","objective":"__bit2__"}}]);
+                    $bit := __bit1__:@s * __bit2__:@s;
+                    debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+                // Two input NAND gate
+                case 1:
+                    $bit := __bit1__:@s * __bit2__:@s * -1 + 1;
+
+                // Two input NOR gate
+                case 2:
+                    $bit = 0;
+                
+                // NOT gate
+                case 3:
+                    debug("NOT");
+                    debug(["Bit: ", {"score":{"name":"@s","objective":"__bit1__"}}]);
+                    $bit := __bit1__:@s * -1 + 1;
+                    debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+
+                // Two input OR gate
+                case 4:
+                    debug ("OR");
+                    $bit := (__bit1__:@s + __bit2__:@s) - (__bit1__:@s * __bit2__:@s);
+
+                // Two input XNOR gate
+                case 5:
+                    $bit = 0;
+
+                // Two input XOR gate
+                case 6:
+                    debug ("XOR");
+                    debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}]);
+                    debug(["Bit 2: ", {"score":{"name":"@s","objective":"__bit2__"}}]);
+                    $bit :=  (__bit1__:@s + __bit2__:@s) % 2;
+                    debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+            }
+
+            execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,tag=!lg.flooded,predicate=mclg:matching_wire_id] at @s run {
+                $gateId = __gateId__:@s;
+
+                execute as @n[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..0.26,predicate=mclg:matching_gate_id] run {
+                    __ticks__:@s++;
+                    
+                    if (__ticks__:@s != __ticksNeeded__:@s) {
+                        execute run {
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                        } with [__ticks__:@s];
+
+                    } else {
+                    execute run {
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                            tag @s add lg.new_flood;
+                        } with [__ticks__:@s];
+                    }
+                }
+            }
+
+            execute as @e[type=block_display,tag=lg.uiElement,tag=!lg.flooded,tag=lg.buffer,distance=..250,predicate=mclg:matching_wire_id] run {
+                if ($bit = 1) {@s::block_state.Properties.lit = "true";}
+                if ($bit = 0) {@s::block_state.Properties.lit = "false";}
+            }
+        }
+        if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=lg.new_flood]) {
+            zzz_.id_flood.promote();
+        }
+    }
+}

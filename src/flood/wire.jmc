@@ -1,0 +1,582 @@
+class bfs.backward {
+    new predicate(etw) {
+    "condition": "minecraft:any_of",
+        "terms": [
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.etw\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.in_w\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.buffer\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.grate\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.gate_output\"]}"
+                }
+            }
+        ]
+    }
+    new predicate(wte) {
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.wte\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_e\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_output\"]}"
+                    }
+                }
+            ]
+    }
+    new predicate(nts) {
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.nts\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_s\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_output\"]}"
+                    }
+                }
+            ]
+    }
+    new predicate(stn) {
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.stn\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_n\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_output\"]}"
+                    }
+                }
+            ]
+    }
+}
+
+class bfs.forward {
+    new predicate(etw) {
+    "condition": "minecraft:any_of",
+        "terms": [
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.etw\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.in_e\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.buffer\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.grate\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.gate_input\"]}"
+                }
+            }
+        ]
+    }
+    new predicate(wte){
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.wte\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_w\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_input\"]}"
+                    }
+                }
+            ]
+    }
+    new predicate(stn){
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.stn\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_s\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_input\"]}"
+                    }
+                }
+            ]
+    }
+    new predicate(nts) {
+        "condition": "minecraft:any_of",
+            "terms": [
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.nts\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.in_n\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.buffer\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.grate\"]}"
+                    }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.gate_input\"]}"
+                    }
+                }
+            ]
+    }
+} 
+
+class zzz_.bfs {
+
+    @lazy function rod (dirX,dirY,flood_direction,predicate) {
+        tag @s add lg.searched;
+        tag @n[type=block_display,tag=lg.bulb,distance=..0.001] add lg.searched;
+        execute positioned ^$dirX ^$dirY ^ as @n[type=block_display,distance=..0.001,tag=!lg.searched,predicate=mclg:bfs/$flood_direction/$predicate] run {
+            this.$flood_direction.get_type();
+        }
+        execute positioned ^$dirX ^$dirY ^ if entity @n[type=block_display,distance=..0.001,tag=!lg.searched,tag=lg.bulb] run {
+            this.$flood_direction.bulb_skip({"dirX":$dirX,"dirY":$dirY,"predicate":"$predicate"});
+        }
+    }
+    @lazy function stair(dirX_1,dirY_1,predicate_1,dirX_2,dirY_2,predicate_2,flood_direction) {
+        this.rod($dirX_1,$dirY_1,$flood_direction,$predicate_1);
+        this.rod($dirX_2,$dirY_2,$flood_direction,$predicate_2);
+    }
+
+    function backward.bulb_skip () {
+        debug("[Backward]: Skip");
+        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,predicate=mclg:bfs/backward/$(predicate),distance=..0.001] at @s run {
+            this.backward.get_type();
+        }
+        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,distance=..0.001] run function mclg:zzz_/bfs/backward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
+    }
+
+    function forward.bulb_skip () {
+        debug("[Forward]: Skip");
+        tag @n[type=block_display,tag=lg.bulb,distance=..0.001] add lg.searched;
+        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,predicate=mclg:bfs/forward/$(predicate),distance=..0.001] at @s run {
+            this.forward.get_type();
+        }
+        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,distance=..0.001] run function mclg:zzz_/bfs/forward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
+    }
+
+    function forward.get_type () {
+        tag @s add lg.searched;
+        switch (__wireType__:@s) {
+            // Rod
+            case 0:
+                switch (__rodRotation__:@s) {
+                    //North to south
+                    case 0:
+                        debug("[Forward]: Rod traveling south");
+                        this.rod(0,-0.25,forward,nts);
+                    break;
+
+                    //West to east
+                    case 1:
+                        debug("[Forward]: Rod traveling west");
+                        this.rod(0.25,0,forward,etw);
+                    break;
+
+                    //South to north
+                    case 2:
+                        debug("[Forward]: Rod traveling north");
+                        this.rod(0,0.25,forward,stn);
+                    break;
+
+                    //West to east
+                    case 3:
+                        debug("[Forward]: Rod traveling east");
+                        this.rod(-0.25,0,forward,wte);
+                    break;
+                }
+            break;
+            
+            // Stairs
+            case 1:
+                switch (__stairRotation__:@s) {
+                    case 0:
+                        debug("[Forward]: Stair inputs north, west");
+                        this.stair(0,0.25,stn,0.25,0,etw,forward);
+                        break;
+                        
+                    case 1:
+                        debug("[Forward]: Stair inputs north, east");
+                        this.stair(0,0.25,stn,-0.25,0,wte,forward);
+                        break;
+                        
+                    case 2:
+                        debug("[Forward]: Stair inputs south, west");
+                        this.stair(0,-0.25,nts,0.25,0,etw,forward);
+                        break;
+
+                    case 3:
+                        debug("[Forward]: Stair inputs south, east");
+                        this.stair(0,-0.25,nts,-0.25,0,wte,forward);
+                        break;
+                        
+                }
+                break;
+
+            // Grates
+            case 3:
+                debug("[Forward]: Grate Split");
+                this.rod(-0.25,0,forward,wte);
+                this.rod(0,-0.25,forward,nts);
+                this.rod(0.25,0,forward,etw);
+                this.rod(0,0.25,forward,stn);
+                break;
+
+            case 4:
+                this.rod(-0.25,0,forward,wte);
+                this.rod(0,-0.25,forward,nts);
+                this.rod(0.25,0,forward,etw);
+                this.rod(0,0.25,forward,stn);
+
+                debug("-_-_-_-_-_- Found Output: Buffer -_-_-_-_-_-");
+                __wireId__:@s = $id;
+
+                execute positioned ^ ^0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^-0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^ ^-0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
+
+                execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
+                execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
+                execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
+                execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
+
+                break;
+            case 5:
+                debug("-_-_-_-_-_- Found Output: Gate -_-_-_-_-_-");
+                __wireId__:@s = $id;
+                break;
+        }
+                
+    }
+    function backward.get_type () {
+        tag @s add lg.searched;
+        switch (__wireType__:@s) {
+            // Rods
+            case 0:
+                switch (__rodRotation__:@s) {
+                    //North to south
+                    case 0:
+                        debug("[Backward]: Rod traveling north");
+                        this.rod(0,0.25,backward,nts);
+                    //West to east
+                    case 1:
+                        debug("[Backward]: Rod traveling east");
+                        this.rod(-0.25,0,backward,etw);
+                    break;
+
+                    //South to north
+                    case 2:
+                        debug("[Backward]: Rod traveling south");
+                        this.rod(0,-0.25,backward,stn);
+                    //East to west
+                    case 3:
+                        debug("[Backward]: Rod traveling west");
+                        this.rod(0.25,0,backward,wte);
+                }
+                break;
+            // Stairs
+            case 1:
+                switch (__stairRotation__:@s) {
+                    case 0:
+                        debug("[Backward]: Stair inputs north, west");
+                        this.stair(0,0.25,nts,0.25,0,wte,backward);
+                    case 1:
+                        debug("[Backward]: Stair inputs north, east");
+                        this.stair(0,0.25,nts,-0.25,0,etw,backward);
+                    case 2:
+                        debug("[Backward]: Stair inputs south, west");
+                        this.stair(0,-0.25,stn,0.25,0,wte,backward);
+                    case 3:
+                        debug("[Backward]: Stair inputs south, east");
+                        this.stair(0,-0.25,stn,-0.25,0,etw,backward);
+
+                }
+                break;
+            // Bulbs
+            case 2:
+                $dir_x = 0;
+                $dir_y = 0;
+                execute positioned ^-0.25 ^ ^ 
+                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] positioned ^0.5 ^ ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] positioned ^-0.25 ^ ^ run {
+                        debug("[Forward]: Bulb traveling west");
+                        $dir_x = 1;
+                        this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:wte});
+                    }
+                execute positioned ^ ^-0.25 ^ 
+                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] positioned ^ ^0.5 ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] positioned ^ ^-0.25 ^ run {
+                        debug("[Forward]: Bulb traveling north");
+                        $dir_y = 1;
+                        this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:nts});
+                    }
+                if ($dir_x = 0) {
+                    execute positioned ^0.25 ^ ^ 
+                        unless entity @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] positioned ^-0.5 ^ ^
+                        if entity @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] positioned ^0.25 ^ ^ run {
+                            debug("[Forward]: Bulb traveling east");
+                            this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:etw});
+                        }
+                }
+                if ($dir_y = 0) {
+                    execute positioned ^ ^0.25 ^ 
+                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] positioned ^ ^-0.5 ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] positioned ^ ^0.25 ^ run {
+                        debug("[Forward]: Bulb traveling south");
+                        this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:stn});
+                    }  
+                }
+                break;
+            // Grates
+            case 3:
+                debug("[Backward]: Grate Split");
+                this.rod(0,0.25,backward,nts);
+                this.rod(-0.25,0,backward,etw);
+                this.rod(0,-0.25,backward,stn);
+                this.rod(0.25,0,backward,wte);
+                
+                break;
+            // Input (buffer or gate)
+            case 4:
+                this.rod(0,0.25,backward,nts);
+                this.rod(-0.25,0,backward,etw);
+                this.rod(0,-0.25,backward,stn);
+                this.rod(0.25,0,backward,wte);
+                
+                debug("-_-_-_-_-_- Found Input -_-_-_-_-_-");
+                tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched] remove lg.searched;
+                tag @s add lg.searched;
+                $id = __wireId__:@s;
+                $gate_id = __gateId__:@s;
+                execute positioned ^ ^0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^-0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
+                execute positioned ^ ^-0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] 
+                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
+
+                execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
+                execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
+                execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
+                execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
+                break;
+            // Gate input
+            case 5:
+                execute positioned ^0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^-0.25 ^ ^ run {this.rod(0.25,0,backward,wte);} break;
+                execute positioned ^-0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^0.25 ^ ^ run {this.rod(-0.25,0,backward,etw);} break;
+                execute positioned ^ ^0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^ ^-0.25 ^ run {this.rod(0,0.25,backward,nts);} break;
+                execute positioned ^ ^-0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^ ^0.25 ^ run {this.rod(0,-0.25,backward,stn);}
+                break;
+        }
+    }
+}

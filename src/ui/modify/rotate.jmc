@@ -1,0 +1,54 @@
+@lazy function rotate.rod(rodRotation) {
+    @s::Tags = ui::element_info.rod.$rodRotation.tags;
+    @s::CustomName = ui::element_info.rod.$rodRotation.display;
+    __rodRotation__:@s = $rodRotation;
+    if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod) {
+        scoreboard players set __if_else__ __variable__ 1;
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
+
+    } else {
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.lightning_rod_facing;
+    }    
+}
+
+@lazy function rotate.stair(stairRotation) {
+    @s::Tags = ui::element_info.stair.$stairRotation.tags;
+    @s::CustomName = ui::element_info.stair.$stairRotation.display;
+    @s::block_state.Properties.half = ui::element_info.stair.$stairRotation.half;
+    @s::block_state.Properties.facing = ui::element_info.stair.$stairRotation.facing;
+    __stairRotation__:@s = $stairRotation;
+}
+
+function rotate () {
+    $id = __playerId__:@s;
+    tag @s add lg.placing;
+    execute at _highlight_ as @n[type=block_display,tag=lg.can_rotate,distance=..0.001] run {
+        if (__wireType__:@s = 0) {
+            __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
+            switch (__rodRotation__:@s) {
+                case 0:
+                    rotate.rod(0);
+                case 1:
+                    rotate.rod(1);
+                case 2:
+                    rotate.rod(2);
+                case 3:
+                    rotate.rod(3);
+            }
+        } else {
+            __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
+            switch (__stairRotation__:@s) {
+                case 0:
+                    rotate.stair(0);
+                case 1:
+                    rotate.stair(1);
+                case 2:
+                    rotate.stair(2);
+                case 3:
+                    rotate.stair(3);
+            }
+        }
+        zzz_.bfs.backward.get_type();
+    }
+    tag @s remove lg.placing;
+}

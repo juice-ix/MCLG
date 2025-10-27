@@ -1,11 +1,12 @@
-import "src/ui/*";
-
 Scoreboard.add(__playerId__);
 
-$uiSize ??= 500;
-
+@if(DEBUG) function debug(text) {
+    tellraw @a $text;
+}
 function  __tick__  () {
     execute as @a unless score @s __playerId__ matches 1.. run {
+        __gateOrientation__:@s ??= 0;
+        __gateType__:@s ??= 0;
         $max = 0;
         execute as @a run $max > __playerId__:@s;
         __playerId__:@s := $max + 1;
@@ -16,3 +17,8 @@ function  __tick__  () {
         $uiSize := 50 - $uiCheck + $uiSize;
     }
 }
+
+import "src/ui/*";
+import "src/flood/*";
+
+$uiSize ??= 500;

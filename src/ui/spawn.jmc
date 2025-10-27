@@ -1,8 +1,8 @@
 function spawn_ui () {
     // Kill the block display and interactions
     kill 0001b3fd-0001-d598-0001-60c20000f5bd;
-    kill @e[type=interaction,tag=lg.uiHitbox];
-    kill @e[type=block_display,tag=lg.highlight];
+    kill @e[type=interaction,distance=..1000,tag=lg.uiHitbox];
+    kill @e[type=block_display,distance=..1000,tag=lg.highlight];
 
     //Scale ui size and offset
     ui::size = 0.25 * (float) $uiSize;

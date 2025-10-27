@@ -38,7 +38,7 @@ class wires {
                 "minecraft:weathered_copper_grate",
                 "minecraft:waxed_exposed_copper_grate",
                 "minecraft:waxed_oxidized_copper_grate",
-                "minecraft:waxed_weathered_copper_grate"
+                "minecraft:waxed_weathered_copper_grate"            
             ]
     }
 
@@ -52,7 +52,9 @@ class wires {
                 "minecraft:weathered_cut_copper_stairs",
                 "minecraft:waxed_exposed_cut_copper_stairs",
                 "minecraft:waxed_oxidized_cut_copper_stairs",
-                "minecraft:waxed_weathered_cut_copper_stairs"
+                "minecraft:waxed_weathered_cut_copper_stairs",
+                "minecraft:smooth_quartz_stairs",
+                "minecraft:quartz_stairs"
             ]
     }
 
@@ -91,6 +93,9 @@ class wires {
                 "minecraft:waxed_exposed_cut_copper_stairs",
                 "minecraft:waxed_oxidized_cut_copper_stairs",
                 "minecraft:waxed_weathered_cut_copper_stairs",
+                "minecraft:smooth_quartz_stairs",
+                "minecraft:quartz_stairs",
+                
 
                 "minecraft:end_rod",
                 "minecraft:lightning_rod",
@@ -353,37 +358,116 @@ if (!data storage mclg:ui element_info) {
         element_info:
         {
             rod: {
-                lightning_rod_facing: "up",
-                end_rod_facing: "down",
-                display: "North to South",
-                tags: [
-                    "lg.uiElement",
-                    "lg.can_rotate",
-                    "lg.wire",
-                    "lg.rod",
-                    "lg.nts"
-                ]
+                0: {
+                    lightning_rod_facing: "up",
+                    end_rod_facing: "down",
+                    display: "North to South",
+                    tags: [
+                        "lg.uiElement",
+                        "lg.can_rotate",
+                        "lg.wire",
+                        "lg.rod",
+                        "lg.nts"
+                    ]
+                },
+                1: {
+                    lightning_rod_facing: "west",
+                    end_rod_facing: "east",
+                    display: "West to East",
+                    tags: [
+                        "lg.uiElement",
+                        "lg.can_rotate",
+                        "lg.wire",
+                        "lg.rod",
+                        "lg.etw"
+                    ]
+                },
+                2: {
+                    lightning_rod_facing: "down",
+                    end_rod_facing: "up",
+                    display: "South to North",
+                    tags: [
+                        "lg.uiElement",
+                        "lg.can_rotate",
+                        "lg.wire",
+                        "lg.rod",
+                        "lg.stn"
+                    ]
+                },
+                3: {
+                    lightning_rod_facing: "east",
+                    end_rod_facing: "west",
+                    display: "East to West",
+                    tags: [
+                        "lg.uiElement",
+                        "lg.can_rotate",
+                        "lg.wire",
+                        "lg.rod",
+                        "lg.wte"
+                    ]
+                }
+                
             },
             stair: {
-                display: "North, West",
-                facing: "west",
-                half: "bottom",
-                tags: [
-                    "lg.can_rotate",
-                    "lg.uiElement",
-                    "lg.stair",
-                    "lg.wire",
-                    "lg.in_n",
-                    "lg.in_w"
-                ]
+                0: {
+                    display: "North, West",
+                    facing: "west",
+                    half: "bottom",
+                    tags: [
+                        "lg.can_rotate",
+                        "lg.uiElement",
+                        "lg.stair",
+                        "lg.wire",
+                        "lg.in_n",
+                        "lg.in_w"
+                    ]
+                },
+                1: {
+                    display: "North, East",
+                    facing: "east",
+                    half: "bottom",
+                    tags: [
+                        "lg.can_rotate",
+                        "lg.uiElement",
+                        "lg.stair",
+                        "lg.wire",
+                        "lg.in_n",
+                        "lg.in_e"
+                    ]
+                },
+                2: {
+                    display: "South, West",
+                    facing: "west",
+                    half: "top",
+                    tags: [
+                        "lg.can_rotate",
+                        "lg.uiElement",
+                        "lg.stair",
+                        "lg.wire",
+                        "lg.in_s",
+                        "lg.in_w"
+                    ]
+                },
+                3: {
+                    display: "South, East",
+                    facing: "east",
+                    half: "top",
+                    tags: [
+                        "lg.can_rotate",
+                        "lg.uiElement",
+                        "lg.stair",
+                        "lg.wire",
+                        "lg.in_s",
+                        "lg.in_e"
+                    ]
+                }       
             },
             gate: {
-                orientation: "Vertical",
-                input_block: "minecraft:lime_wool",
-                type: "AND",
                 tags: [
                     "lg.uiElement",
-                    "lg.AND"
+                    "lg.gate_output",
+                    "lg.gate",
+                    "lg.hasWireId"
                 ]
             }
         }
@@ -392,6 +476,12 @@ if (!data storage mclg:ui element_info) {
 
 Scoreboard.add(__wireId__);
 Scoreboard.add(__gateId__);
+Scoreboard.add(__gateType__); __gateType__:@a ??= 0;
+Scoreboard.add(__gateOrientation__); __gateOrientation__:@a ??= 0;
+Scoreboard.add(__stairRotation__); __stairRotation__:@a ??= 0;
+Scoreboard.add(__rodRotation__); __rodRotation__:@a ??= 0;
+Scoreboard.add(__wireType__);
+Scoreboard.add(__ticksNeeded__);
 
 Scoreboard.add(__pos0__);
 Scoreboard.add(__pos1__);
@@ -406,38 +496,39 @@ Scoreboard.add(__pp3__);
 Scoreboard.add(__pp4__);
 Scoreboard.add(__pp5__);
 
-
 class zzz_.ui.place {
 
-    @lazy function place_fill (extra) {
+    @lazy function place_fill (cmds) {
 
         // Set the target item to the currently held item
         ui::element_info.item = @s::SelectedItem.id;
         $id = __playerId__:@s;
-        for ($x = __pp0__:@s; $x <= __pp3__:@s; $x += 25) {
-            for ($y = __pp1__:@s; $y <= __pp4__:@s; $y += 25) {
-                for ($z = __pp2__:@s; $z <= __pp5__:@s; $z += 25) {
+        execute at _highlight_ run {
+            for ($x = __pp0__:@s; $x <= __pp3__:@s; $x += 25) {
+                for ($y = __pp1__:@s; $y <= __pp4__:@s; $y += 25) {
+                    for ($z = __pp2__:@s; $z <= __pp5__:@s; $z += 25) {
+                        
+                        // Summon ui element unless there's another one in the current position
+                        if (!entity @e[distance=..250,predicate=mclg:place_uielement/at_current_cell,limit = 2]) {
+                            $fillVolume++;
+                            execute summon block_display run {
+                                rotate @s ~ ~;
 
-                    // Summon ui element unless there's another one in the current position
-                    if (!entity @e[predicate=mclg:place_uielement/at_current_cell,limit = 2]) {
-                        $fillVolume++;
-                        execute rotated as _highlight_ summon block_display run {
-                            rotate @s ~ ~;
+                                @s::Pos[0] = 0.01 * (float) $x;
+                                @s::Pos[1] = 0.01 * (float) $y;
+                                @s::Pos[2] = 0.01 * (float) $z;
 
-                            @s::Pos[0] = 0.01 * (float) $x;
-                            @s::Pos[1] = 0.01 * (float) $y;
-                            @s::Pos[2] = 0.01 * (float) $z;
+                                __pos0__:@s = $x;
+                                __pos1__:@s = $y;
+                                __pos2__:@s = $z;
 
-                            __pos0__:@s = $x;
-                            __pos1__:@s = $y;
-                            __pos2__:@s = $z;
-
-                            @s::block_state.Name = ui::element_info.item;
-                            @s::transformation.scale = [0.25f, 0.25f, 0.25f];
-                            JMC.put("function mclg:zzz_/ui/place/apply_data/$extra");               
+                                @s::block_state.Name = ui::element_info.item;
+                                @s::transformation.scale = [0.25f, 0.25f, 0.25f];
+                                JMC.call($cmds);              
+                            }
                         }
+                        
                     }
-                    
                 }
             }
         }
@@ -445,46 +536,124 @@ class zzz_.ui.place {
 
     @lazy function set_wireId() {
         $max = 0;
-        execute as @e[type=block_display,tag=lg.has_wire_id] run $max > __wireId__:@s;
+        $max > __wireId__:@e[type=block_display,tag=lg.hasWireId];
         $max++;
         __wireId__:@s = $max;
     }
 
-    function apply_data.rod () {
-        @s::Tags = ui::element_info.rod.tags;
-        @s::CustomName = ui::element_info.rod.display;
-        if ($holding_end_rod) {@s::block_state.Properties.facing = ui::element_info.rod.end_rod_facing;}
-        else {@s::block_state.Properties.facing = ui::element_info.rod.lightning_rod_facing;}
+    @lazy function set_gateId() {
+        $max = 0;
+        $max > __gateId__:@e[type=block_display,tag=lg.gate];
+        $max++;
+        __gateId__:@s = $max;
     }
-    function apply_data.stair () {
-        @s::Tags = ui::element_info.stair.tags;
-        @s::CustomName = ui::element_info.stair.display;
-        @s::block_state.Properties.half = ui::element_info.stair.half;
-        @s::block_state.Properties.facing = ui::element_info.stair.facing;
+
+    @lazy function rotate.rod(rodRotation) {
+        @s::Tags = ui::element_info.rod.$rodRotation.tags;
+        @s::CustomName = ui::element_info.rod.$rodRotation.display;
+        __rodRotation__:@s = $rodRotation;
+        __wireType__:@s = 0;
+
+        if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod) {
+            scoreboard players set __if_else__ __variable__ 1;
+            @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
+
+        } else {
+            @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.lightning_rod_facing;
+        }    
     }
-    function apply_data.bulb () {
+
+    @lazy function apply_data.rod () {
+        switch (__rodRotation__:@p[tag=lg.placing]) {
+            case 0:
+                this.rotate.rod(0);
+            case 1:
+                this.rotate.rod(1);
+            case 2:
+                this.rotate.rod(2);
+            case 3:
+                this.rotate.rod(3);
+        }
+        
+    }
+    @lazy function apply_data.stair () {
+        execute run {
+            __wireType__:@s = 1;
+            $@s::Tags = ui::element_info.stair.$(0).tags;
+            $@s::CustomName = ui::element_info.stair.$(0).display;
+            $@s::block_state.Properties.half = ui::element_info.stair.$(0).half;
+            $@s::block_state.Properties.facing = ui::element_info.stair.$(0).facing;
+            __stairRotation__:@s = __stairRotation__:@p[tag=lg.placing];
+        } with [__stairRotation__:@p[tag=lg.placing]];
+        
+    }
+    @lazy function apply_data.bulb () {
+        __wireType__:@s = 2;
         tag @s add lg.wire;
         tag @s add lg.bulb;
         tag @s add lg.uiElement;
         @s::CustomName = "Bulb";
     }
-    function apply_data.grate () {
+    @lazy function apply_data.grate () {
+        __wireType__:@s = 3;
         tag @s add lg.wire;
         tag @s add lg.grate;
         tag @s add lg.uiElement;
         @s::CustomName = "Splitter";
     }
-    function apply_data.buffer () {
+    @lazy function apply_data.buffer () {
+        __wireType__:@s = 4;
         tag @s add lg.wire;
         tag @s add lg.buffer;
-        tag @s add lg.has_wire_id;
+        tag @s add lg.hasWireId;
         tag @s add lg.uiElement;
         this.set_wireId();
 
         @s::CustomName = "Buffer";
     }
-    function apply_data.general () {
+    @lazy function apply_data.general () {
         tag @s add lg.uiElement;
+    }
+
+    @lazy function apply_data.gates.vertical (wool,type) {
+        summon block_display ~ ~0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.gate_top"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        
+        this.set_gateId();
+        __gateType__:@s = $type;
+        execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.26,limit=2] run {
+            __wireType__:@s = 5;
+            __pos0__:@s := __pos0__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
+            __pos2__:@s := __pos2__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
+
+            if (entity @s[tag=lg.gate_top]) {
+                __pos1__:@s := __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.5] + 25;
+                tag @s remove lg.gate_top;
+            } else {
+                __pos1__:@s := __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.5] - 25;
+                tag @s remove lg.gate_bottom;
+            }
+
+            rotate @s ~ ~;
+            __gateId__:@s = $max;
+            tag @s remove lg.gate_temp;
+
+            execute at @s run zzz_.bfs.backward.get_type();
+        }
+    }
+    @lazy function apply_data.gates.horizontal (wool,type) {
+        summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        this.set_gateId();
+        __gateType__:@s = $type;
+        execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.25,limit=2] run {
+            __pos0__:@s = @s::Pos[0] * 100;
+            __pos1__:@s = __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
+            __pos2__:@s = @s::Pos[2] * 100;
+            rotate @s ~ ~;
+            __gateID__:@s = $max;
+            tag @s remove lg.gate_temp;
+        }
     }
 
     function single() {
@@ -494,7 +663,7 @@ class zzz_.ui.place {
         __cbp__:@s = -1;
         execute at _highlight_ run {
             if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
-
+                tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
                 tag @s add lg.placing;
                 execute summon block_display run {
                     
@@ -508,20 +677,90 @@ class zzz_.ui.place {
                     @s::transformation.scale = [0.25f, 0.25f, 0.25f];
 
                     if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/rods) {
-                        $holding_end_rod ?= execute if items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod;
                         this.apply_data.rod();
+                        zzz_.bfs.backward.get_type();
 
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/stairs) {
                         this.apply_data.stair();
+                        zzz_.bfs.backward.get_type();
 
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/bulbs) {
                         this.apply_data.bulb();
-
+                        zzz_.bfs.backward.get_type();
+                        
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/grates) {
                         this.apply_data.grate();
+                        zzz_.bfs.backward.get_type();
                         
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:redstone_lamp){
                         this.apply_data.buffer();
+                        zzz_.bfs.backward.get_type();
+
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:sea_lantern) {
+                        @s::Tags = ui::element_info.gate.tags;
+                        __wireType__:@s = 4;
+                        this.set_wireId();
+                        __ticksNeeded__:@s = 2;
+                        switch (__gateType__:@p[tag=lg.placing]) {
+                            //AND
+                            case 0:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(lime,0);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(lime,0);
+                                };
+                            //NAND
+                            case 1:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(brown,1);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(brown,1);
+                                };
+                            //NOR
+                            case 2:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(gray,2);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(gray,2);
+                                };
+                            //NOT
+                            case 3:
+                                @s::block_state.Name = "red_wool";
+                                tag @s add lg.gate_input;
+                                __ticksNeeded__:@s = 1;
+                                __gateType__:@s = 3;
+                                zzz_.bfs.backward.get_type();
+                            //OR
+                            case 4:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(cyan,4);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(cyan,4);
+                                };
+                            //XNOR
+                            case 5:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(yellow,5);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(yellow,5);
+                                };
+                            //XOR
+                            case 6:
+                                switch (__gateOrientation__:@p[tag=lg.placing]) {
+                                    case 0:
+                                        this.apply_data.gates.vertical(orange,6);
+                                    case 1:
+                                        this.apply_data.gates.horizontal(orange,6);
+                                };
+
+                                
+                        }
+
                     }
                     else {tag @s add lg.uiElement;}
                 }
@@ -556,29 +795,40 @@ class zzz_.ui.place {
                 if (__pp2__:@s > __pp5__:@s) {__pp2__:@s >< __pp5__:@s;}
                 
                 $fillVolume = 0;
-
+                tag @s add lg.placing;
                 if (items entity @s weapon.mainhand #mclg:wires/rods) {
 
-                    $holding_end_rod ?= execute if items entity @s weapon.mainhand minecraft:end_rod;
-                    this.place_fill(rod);
+                    this.place_fill(()=>{
+                        this.apply_data.rod();
+                    });
 
                 } else if (items entity @s weapon.mainhand #mclg:wires/stairs) {
                     
-                    this.place_fill(stair);
+                    this.place_fill(()=>{
+                        this.apply_data.stair();
+                    });
 
                 } else if (items entity @s weapon.mainhand #mclg:wires/bulbs) {
-                    this.place_fill(bulb);
+                    this.place_fill(()=>{
+                        this.apply_data.bulb();
+                    });
 
                 } else if (items entity @s weapon.mainhand #mclg:wires/grates) {
-                    this.place_fill(grate);
+                    this.place_fill(()=>{
+                        this.apply_data.grate();
+                    });
                     
                 } else if (items entity @s weapon.mainhand minecraft:redstone_lamp){
-                    this.place_fill(buffer);
+                    this.place_fill(()=>{
+                        this.apply_data.buffer();
+                    });
 
                 } else {
-                    this.place_fill(general);
+                    this.place_fill(()=>{
+                        this.apply_data.general();
+                    });
                 }
-
+                tag @s remove lg.placing;
                 if ($fillVolume = 1) {printf("\nPlaced &<$fillVolume,italic> &<!italic>element");} 
                 else {printf("\nPlaced &<$fillVolume,italic> &<!italic>elements");}
             }

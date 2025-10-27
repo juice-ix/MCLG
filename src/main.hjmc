@@ -8,3 +8,8 @@
 #define _highlighted_ @n[type = block_display, tag=lg.uiElement, distance = ..0.001]
 
 #define _uiElement_ @n[type = block_display, tag=lg.uiElement ,distance = ..0.001]
+
+#define $if(x) execute if x run
+#define $else execute if score  __if_else__ __variable__ matches run
+
+#define DEBUG 0

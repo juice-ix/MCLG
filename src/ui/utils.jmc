@@ -1,0 +1,28 @@
+function toggle_starter () {
+    $id = __playerId__:@s;
+    execute at _highlight_ run {
+        $state = @n[tag=lg.buffer,distance=..0.001]::block_state.Properties.lit;
+        if (entity @n[tag=lg.buffer,distance=..0.001,tag=lg.starter]) {
+            tag @n[tag=lg.buffer,distance=..0.001] remove lg.starter;
+            tellraw @s "Removed starter tag";
+        }
+        else {
+            tag @n[tag=lg.buffer,distance=..0.001] add lg.starter;
+            tellraw @s "Added starter tag";
+        }
+    }
+}
+
+function toggle_bit () {
+    $id = __playerId__:@s;
+    execute at _highlight_ run {
+        $state = @n[tag=lg.buffer,distance=..0.001]::block_state.Properties.lit;
+        if ($state = 4) {
+            data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "false";
+        }
+        if ($state = 5) {
+            data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "true";
+        }
+    }
+    
+}
