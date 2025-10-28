@@ -39,7 +39,7 @@ This acts as a block for all gate types. By default, there are 6 two-input gate 
 It is possible to manually add gate types with varying numbers of inputs.
 
 ## Saving Circuits
-You can use shulkers boxes to save an area of element positions and data relative to a point. To do this, simply right click two points while not sprinting. This will give you a number of shulker boxes.
+You can use shulkers boxes to save an area of element positions and data relative to a point. To do this, simply right click two points while not sprinting with a shulker box in your mainhand. This will give you a number of shulker boxes.
  - If the selected area contains > 999 ui elements, a new shulker box will be created. This is due to packet limitations.
  - Shulker boxes that are a part of the same circuit are linked by cicruit IDs inside custom data. Placing one will place the full circuit.
  - There are a number of pre-added circuits. Simply do `/function mclg:give` to get a selection of circuits. Alternatively, you can run `/function mclg:give_all` to get every one.
