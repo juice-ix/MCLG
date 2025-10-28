@@ -20,7 +20,8 @@ function  __tick__  () {
 
 import "src/ui/*";
 import "src/flood/*";
+import "items";
 
 $uiSize ??= 500;
-$chipId ??= -intLimit;
+$chipId ??= -2147483600;
 $maxChipBlocksPerTick = 100;
