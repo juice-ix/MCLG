@@ -350,6 +350,67 @@ class place_uielement {
             }
         }
     }
+
+    new predicate(between_rp) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+            "__pos0__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$min_x"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                            "name": "$max_x"
+                    },
+                    "score": "__variable__"
+                }
+            },
+            "__pos1__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$min_y"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$max_y"
+                    },
+                    "score": "__variable__"
+                }
+            },
+            "__pos2__": {
+                "min": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$min_z"
+                    },
+                    "score": "__variable__"
+                },
+                "max": {
+                    "type": "minecraft:score",
+                        "target": {
+                        "type": "minecraft:fixed",
+                        "name": "$max_z"
+                    },
+                    "score": "__variable__"
+                }
+            }
+        }
+    }
 }
 
 // Initliaze ui element info
@@ -616,8 +677,8 @@ class zzz_.ui.place {
     }
 
     @lazy function apply_data.gates.vertical (wool,type) {
-        summon block_display ~ ~0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.gate_top"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
-        summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ~ ~0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_top"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         
         this.set_gateId();
         __gateType__:@s = $type;
@@ -656,13 +717,96 @@ class zzz_.ui.place {
         }
     }
 
+    @lazy function chip.store_data () {
+        tag @s remove lg.chip_build;
+        execute if entity @s[tag=lg.starter] run tag @s remove lg.starter;
+        if (!__pp0__:@p[tag=lg.saving,distance=..250] = __pp3__:@p[tag=lg.saving,distance=..250]) {$relPos_x := {@s::Pos[0] * 100} - $chipStart_x;} 
+        else {$relPos_x := {@s::Pos[2] * 100} - $chipStart_z;}
+
+        if (entity @s[tag=lg.hasWireId]) {
+            $relId_wire = __wireId__:@s;
+            $relId_wire -= $min_wireId;
+            chip::build.info.rel_id.wire = $relId_wire;
+        } else if (data storage mclg:chip build.info.rel_id.wire) {
+            chip::build.info.rel_id.wire.del();
+        }
+        if (entity @s[tag=lg.gate]) {
+            $relId_gate = __gateId__:@s;
+            $relId_gate -= $min_gateId;
+            chip::build.info.rel_id.gate = $relId_gate;
+
+        } else if (data storage mclg:chip build.info.rel_id.gate) {
+            chip::build.info.rel_id.gate.del();
+        }
+        if (entity @s[tag=lg.rod]) {
+            chip::build.info.rotation = __rodRotation__:@s;
+        } else if (entity @s[tag=lg.stair]) {
+            chip::build.info.rotation = __stairRotation__:@s;
+        } else if (entity @s[tag=lg.gate_output]) {
+            chip::build.info.gateType = __gateType__:@s;
+            chip::build.info.gateTicks = __ticksNeeded__:@s;
+        } else if (data storage mclg:chip build.info.rotation) {
+            chip::build.info.rotation.del();
+        }
+
+        $relPos_y := {@s::Pos[1] * 100} - $chipStart_y; 
+
+        chip::build.info.Tags = @s::Tags;
+        chip::build.info.block_state = @s::block_state;
+        chip::build.info.CustomName = @s::CustomName;
+        chip::build.info.rel_pos.x = 0.01 * (float) $relPos_x;
+        chip::build.info.rel_pos.y = 0.01 * (float) $relPos_y;
+        chip::build.info.wireType = __wireType__:@s;
+
+        chip::build.arr >> chip::build.info;
+    }
+
+    @lazy function chip.give_item () {
+        chip::build.num = $chip_num++;
+        chip::build.id = $chipId;
+        execute at @p[tag=lg.saving,distance=..250] run {
+            summon item ~ ~ ~ {Tags:["lg.temp_item"],Item:{"id":"minecraft:bow","count":1},PickupDelay:0};
+            execute as @n[type=item,tag=lg.temp_item] run {
+
+                item replace entity @s contents from entity @p[tag=lg.saving,distance=..250] weapon.mainhand;
+                $item modify entity @s contents {function:"minecraft:set_name",name:{text:"Chip_$(num)"},target:"item_name",conditions:[]};
+                $item modify entity @s contents {function:"minecraft:set_custom_data",tag:{blocks:$(arr),"id":$(id),"lg.chip":1b},conditions:[]};
+                chip::build.del();
+            } with chip::build;
+        }
+    }
+
+    function chip.build () {
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.chip_build,distance=..250,limit = 1000] run {
+            $build := ($build + 1) % 1000;
+            $packVolume++;
+            debug({"score":{"name":"$build","objective":"__variable__"}});
+
+            if ($build != 0) {
+                this.chip.store_data();
+
+                if ($packVolume = $recur) {
+                    debug("Finished building chip");
+                    this.chip.give_item();
+                    tag @p[tag=lg.saving] remove lg.saving;
+                }
+
+            } else {
+                debug("1000");
+                this.chip.store_data();
+                this.chip.give_item();
+                schedule function this.chip.build() 5t replace;
+            }
+        }
+    }
+
     function single() {
 
         $id = __playerId__:@s;
-        __cpp__:@s = -1;
-        __cbp__:@s = -1;
         execute at _highlight_ run {
             if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
+                __cpp__:@s = -1;
+                __crp__:@s = -1;
                 tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
                 tag @s add lg.placing;
                 execute summon block_display run {
@@ -765,16 +909,151 @@ class zzz_.ui.place {
                     else {tag @s add lg.uiElement;}
                 }
                 tag @s remove lg.placing;
-            } 
+            } else if (items entity @s weapon.mainhand #minecraft:shulker_boxes[!custom_data~{"lg.chip":1b}]) {
+                __cpp__:@s := (__cpp__:@s + 1) % 3;
+                __crp__:@s = -1;
+
+                if (__cpp__:@s = 0) {
+                    __pp0__:@s = ui::highlightPos[0] * 100;
+                    __pp1__:@s = ui::highlightPos[1] * 100;
+                    __pp2__:@s = ui::highlightPos[2] * 100;
+
+                    tellraw @s "Set Point 1";
+                } else if (__cpp__:@s = 1) {
+
+                    __pp3__:@s = ui::highlightPos[0] * 100;
+                    __pp4__:@s = ui::highlightPos[1] * 100;
+                    __pp5__:@s = ui::highlightPos[2] * 100;
+
+                    tellraw @s "Set Point 2. Right click to confirm.";
+                } else {
+                    tag @s add lg.saving;
+                    $chipStart_x = __pp0__:@s;
+                    $chipStart_y = __pp1__:@s;
+                    $chipStart_z = __pp2__:@s;
+
+                    if (__pp0__:@s > __pp3__:@s) {__pp0__:@s >< __pp3__:@s;}
+                    if (__pp1__:@s > __pp4__:@s) {__pp1__:@s >< __pp4__:@s;}
+                    if (__pp2__:@s > __pp5__:@s) {__pp2__:@s >< __pp5__:@s;}
+                    
+                    $packVolume = 0;
+
+                    $min_x = __pp0__:@s;
+                    $min_y = __pp1__:@s;
+                    $min_z = __pp2__:@s;
+                    $max_x = __pp3__:@s;
+                    $max_y = __pp4__:@s;
+                    $max_z = __pp5__:@s;
+                    
+                    $build = 0;
+                    $chip_num = 0;
+                    $min_gateId = intLimit;
+                    $min_wireId = intLimit;
+                    $chipId++;
+                    execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.gate] run {
+                        $min_gateId < __gateId__:@s;
+                    }
+                    execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId] run {
+                        $min_wireId < __wireId__:@s;
+                    }
+                    $min_gateId--;
+                    $min_wireId--;
+                    debug({score:{name:"$min_wireId",objective:"__variable__"}});
+                    debug({score:{name:"$min_gateId",objective:"__variable__"}});
+                    $recur = execute if entity @e[type=block_display,tag=lg.uiElement,distance=..250,predicate=mclg:between_points];
+                    tag @e[type=block_display,tag=lg.uiElement,distance=..250,predicate=mclg:between_points] add lg.chip_build;
+
+                    execute as @e[type=block_display,tag=lg.uiElement,tag=lg.chip_build,distance=..250,limit = 1000] run {
+                        $build := ($build + 1) % 1000;
+                        $packVolume++;
+                        debug({"score":{"name":"$build","objective":"__variable__"}});
+
+                        if ($build != 0) {
+                            this.chip.store_data();
+
+                            if ($packVolume = $recur) {
+                                debug("Finished building chip");
+                                this.chip.give_item();
+                            }
+
+                        } else {
+                            debug("1000");
+                            this.chip.store_data();
+                            this.chip.give_item();
+                            schedule function this.chip.build() 5t replace;
+                        }
+                    }
+                }
+            } else if (items entity @s weapon.mainhand #minecraft:shulker_boxes[custom_data~{"lg.chip":1b}]) {
+                $chipId = @s::SelectedItem.components.minecraft:custom_data.id;
+                execute run {
+                    $chip::place.arrs << @s::Inventory[{components:{"minecraft:custom_data":{id:$(0)}}}].components."minecraft:custom_data".blocks;
+                    $chip::place.arrs << @s::equipment[{components:{"minecraft:custom_data":{id:$(0)}}}].components."minecraft:custom_data".blocks;
+
+                } with [$chipId];
+                $place = 0;
+                $max_gateId = 0;
+                $max_wireId = 0;
+                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId__:@s;
+                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate,distance=..250] run $max_gateId > __gateId__:@s;
+                    
+                 for ($i = chip::place.arrs; $i > 0; $i--) {
+                    for ($j = chip::place.arrs[-1]; $j > 0; $j--) {
+                        execute summon block_display run {
+                            rotate @s ~ ~;
+                            @s::block_state = chip::place.arrs[-1][-1].block_state;
+                            @s::CustomName = chip::place.arrs[-1][-1].CustomName;
+                            @s::transformation.scale = [0.25f, 0.25f, 0.25f];
+                            @s::Tags = chip::place.arrs[-1][-1].Tags;
+                            __wireType__:@s = chip::place.arrs[-1][-1].wireType;
+
+                            if (entity @s[tag=lg.rod]) {
+                                __rodRotation__:@s = chip::place.arrs[-1][-1].rotation;
+                            } else if (entity @s[tag=lg.stair]) {
+                                __stairRotation__:@s = chip::place.arrs[-1][-1].rotation;
+                            } else if (entity @s[tag=lg.gate]) {
+                                __gateType__:@s = chip::place.arrs[-1][-1].gateType;
+                                __ticksNeeded__:@s = chip::place.arrs[-1][-1].gateTicks;
+                            }
+                            execute run {
+                                $tp @s ^$(x) ^$(y) ^;
+                                $yaw = _highlight_::Rotation[0];
+                                if ($yaw = 0 || $yaw = 2) {@s::Pos[2] = _highlight_::Pos[2];} 
+                                else {@s::Pos[0] = _highlight_::Pos[0];}
+
+                            } with chip::place.arrs[-1][-1].rel_pos;
+
+                            $x = __pos0__:@s = @s::Pos[0] * 100;
+                            $y = __pos1__:@s = @s::Pos[1] * 100;
+                            $z = __pos2__:@s = @s::Pos[2] * 100;
+                            
+                            tag @s add lg.chip_placing;
+                                if (entity @n[type=block_display,tag=lg.uiElement,tag=!lg.chip_placing,predicate=mclg:place_uielement/at_current_cell]) {
+                                    kill @s;
+                                }
+                            tag @s remove lg.chip_placing;
+                            
+                            if (data storage mclg:chip place.arrs[-1][-1].rel_id.wire) {
+                                __wireId__:@s := {chip::place.arrs[-1][-1].rel_id.wire} + $max_wireId;
+                            }
+                            if (data storage mclg:chip place.arrs[-1][-1].rel_id.gate) {
+                                __gateId__:@s := {chip::place.arrs[-1][-1].rel_id.gate} + $max_gateId;
+                            }
+                        }
+                        chip::place.arrs[-1][-1].del();
+                    }
+                    chip::place.arrs[-1].del();
+                    
+                }  
+            }
         }
         Advancement.revoke(@s, only, place_uielement/single);
     }
-
     function fill() {
         if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
 
             __cpp__:@s := (__cpp__:@s + 1) % 3;
-            __cbp__:@s = -1;
+            __crp__:@s = -1;
             
             if (__cpp__:@s = 0) {
                 __pp0__:@s = ui::highlightPos[0] * 100;
@@ -836,8 +1115,4 @@ class zzz_.ui.place {
 
         Advancement.revoke(@s, only, place_uielement/fill);
     }
-}
-function get_id () {
-    $id = __playerId__:@s;
-    execute at _highlight_ as _highlighted_ run return run scoreboard players get @s __wireId__;
 }

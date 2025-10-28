@@ -155,65 +155,65 @@ class remove_uielement {
             "rewards": {
             "function": "mclg:zzz_/ui/remove/fill"
         }
-    }
+    } 
+}
 
-    new predicate(between_rp) {
-    "condition": "minecraft:entity_scores",
-        "entity": "this",
-        "scores": {
-            "__pos0__": {
-                "min": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                        "name": "$min_x"
-                    },
-                    "score": "__variable__"
+new predicate(between_points) {
+"condition": "minecraft:entity_scores",
+    "entity": "this",
+    "scores": {
+        "__pos0__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$min_x"
                 },
-                "max": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                            "name": "$max_x"
-                    },
-                    "score": "__variable__"
-                }
+                "score": "__variable__"
             },
-            "__pos1__": {
-                "min": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                        "name": "$min_y"
-                    },
-                    "score": "__variable__"
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$max_x"
                 },
-                "max": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                        "name": "$max_y"
-                    },
-                    "score": "__variable__"
-                }
+                "score": "__variable__"
+            }
+        },
+        "__pos1__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$min_y"
+                },
+                "score": "__variable__"
             },
-            "__pos2__": {
-                "min": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                        "name": "$min_z"
-                    },
-                    "score": "__variable__"
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$max_y"
                 },
-                "max": {
-                    "type": "minecraft:score",
-                        "target": {
-                        "type": "minecraft:fixed",
-                        "name": "$max_z"
-                    },
-                    "score": "__variable__"
-                }
+                "score": "__variable__"
+            }
+        },
+        "__pos2__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$min_z"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$max_z"
+                },
+                "score": "__variable__"
             }
         }
     }
@@ -274,7 +274,7 @@ class zzz_.ui.remove {
                     execute run {
                         tag @s add lg.replacing;
                         ui::element_info.item = @p[tag=lg.replacing]::SelectedItem.id;
-                        $execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:remove_uielement/between_rp,nbt={block_state:{Name:"$(id)"}}]
+                        $execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points,nbt={block_state:{Name:"$(id)"}}]
                         run {
                             $removeVolume++;
                             $data modify entity @s block_state.Name set value "$(item)";
@@ -304,14 +304,14 @@ class zzz_.ui.remove {
                     } with @s::equipment.offhand;
                 } else {
                     execute run {
-                        $execute store result score $removeVolume __variable__ run kill @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:remove_uielement/between_rp,nbt={block_state:{Name:"$(id)"}}];
+                        $execute store result score $removeVolume __variable__ run kill @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points,nbt={block_state:{Name:"$(id)"}}];
                     
                         if ($removeVolume = 1) {printf("\nRemoved &<$removeVolume,italic> &<!italic>element");} 
                         else {printf("\nRemoved &<$removeVolume,italic> &<!italic>elements");}
                     } with @s::equipment.offhand;
                 }
             } else {
-                $removeVolume = kill @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:remove_uielement/between_rp];
+                $removeVolume = kill @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points];
                 if ($removeVolume = 1) {printf("\nRemoved &<$removeVolume,italic> &<!italic>element");} 
                 else {printf("\nRemoved &<$removeVolume,italic> &<!italic>elements");}
             }

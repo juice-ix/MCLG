@@ -1,6 +1,6 @@
 Scoreboard.add(__playerId__);
 
-@if(DEBUG) function debug(text) {
+@if(dbg) function debug(text) {
     tellraw @a $text;
 }
 function  __tick__  () {
@@ -22,3 +22,5 @@ import "src/ui/*";
 import "src/flood/*";
 
 $uiSize ??= 500;
+$chipId ??= -intLimit;
+$maxChipBlocksPerTick = 100;

@@ -67,7 +67,7 @@ function id_flood () {
             $bit = @s::block_state.Properties.lit;
             if ($bit = 4) {$bit = 1;}
             if ($bit = 5) {$bit = 0;}
-            
+            debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
             execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,tag=!lg.flooded,predicate=mclg:matching_wire_id] at @s run {
                 $gateId = __gateId__:@s;
                 

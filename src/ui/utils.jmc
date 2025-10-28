@@ -26,3 +26,17 @@ function toggle_bit () {
     }
     
 }
+
+function set_chip_name () {
+    $item modify entity @s weapon.mainhand {function:"minecraft:set_name",name:{text:"$(name)"},target:"item_name",conditions:[]};
+}
+
+function get_wireid () {
+    $id = __playerId__:@s;
+    execute at _highlight_ as _highlighted_ run return run scoreboard players get @s __wireId__;
+}
+
+function get_gateid () {
+    $id = __playerId__:@s;
+    execute at _highlight_ as _highlighted_ run return run scoreboard players get @s __gateId__;
+}
