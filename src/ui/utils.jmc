@@ -19,9 +19,15 @@ function toggle_bit () {
         $state = @n[tag=lg.buffer,distance=..0.001]::block_state.Properties.lit;
         if ($state = 4) {
             data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "false";
+            if (__bitmask__:@n[tag=lg.buffer,distance=..0.001] > 0) {
+                __packs__:$pack_0 -= __bitmask__:@n[tag=lg.buffer,distance=..0.001];
+            }
         }
         if ($state = 5) {
             data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "true";
+            if (__bitmask__:@n[tag=lg.buffer,distance=..0.001]) {
+                __packs__:$pack_0 += __bitmask__:@n[tag=lg.buffer,distance=..0.001];
+            }
         }
     }
     
