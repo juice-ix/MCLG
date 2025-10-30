@@ -89,12 +89,13 @@ function id_flood () {
                     if (__ticks__:@s != __ticksNeeded__:@s) {
                         execute run {
                             $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                            $scoreboard players operation @s __prevBit$(0)__ = $bit __variable__;
                         } with [__ticks__:@s];
 
                     } else {
                     execute run {
                             $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
-                            $scoreboard players operation @s __prevBit$(0)__ = $bit __variable__;
+                            
                             tag @s add lg.new_flood;
                         } with [__ticks__:@s];
                     }
