@@ -1029,6 +1029,7 @@ class zzz_.ui.place {
                                 __gateType__:@s = chip::place.arrs[-1][-1].gateType;
                                 __ticksNeeded__:@s = chip::place.arrs[-1][-1].gateTicks;
                             }
+                            if (entity @s[tag=lg.permaStarter,tag=lg.buffer]) {tag @s add lg.starter;}
                             execute run {
                                 $tp @s ^$(x) ^$(y) ^;
                                 $yaw = _highlight_::Rotation[0];

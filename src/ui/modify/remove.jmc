@@ -280,7 +280,6 @@ class zzz_.ui.remove {
                             $data modify entity @s block_state.Name set value "$(item)";
                             data modify entity @s Tags set value [];
                             if (items entity @p[tag=lg.placing] weapon.mainhand #mclg:wires/rods) {
-                                $holding_end_rod ?= execute if items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod;
                                 zzz_.ui.place.apply_data.rod();
 
                             } else if (items entity @p[tag=lg.replacing] weapon.mainhand #mclg:wires/stairs) {

@@ -18,8 +18,17 @@ function  __tick__  () {
     }
 }
 
-import "src/ui/*";
-import "src/flood/*";
+import "ui/modify/place";
+import "ui/modify/remove";
+import "ui/modify/rotate";
+import "ui/raycast";
+import "ui/spawn";
+import "ui/utils";
+
+import "flood/compiled";
+import "flood/id";
+import "flood/wire";
+
 import "items";
 
 $uiSize ??= 500;

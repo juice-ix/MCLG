@@ -1,6 +1,7 @@
 Scoreboard.add(__ticks__);
-Scoreboard.add(__bit1__);
-Scoreboard.add(__bit2__);
+Scoreboard.add(__bit1__); Scoreboard.add(__bit2__);
+Scoreboard.add(__prevBit1__); Scoreboard.add(__prevBit2__);
+Scoreboard.add(__repeatBit__);
 
 new predicate(matching_wire_id) {
     "condition": "minecraft:entity_scores",
@@ -60,6 +61,8 @@ function id_flood () {
         tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.flooded] remove lg.flooded;
         tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.new_flood] remove lg.new_flood;
         __ticks__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId] = 0;
+        __prevBit1__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId,scores={__prevBit1__=0..}] = -1;
+        __prevBit2__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId,scores={__prevBit2__=0..}] = -1;
 
         execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,tag=lg.starter,distance=..250] run {
 
@@ -91,6 +94,7 @@ function id_flood () {
                     } else {
                     execute run {
                             $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                            $scoreboard players operation @s __prevBit$(0)__ = $bit __variable__;
                             tag @s add lg.new_flood;
                         } with [__ticks__:@s];
                     }
@@ -118,81 +122,106 @@ function zzz_.id_flood.promote () {
 
         // Add flooded tag to ensure it doesn't get flooded twice
         tag @s remove lg.new_flood;
-        tag @s add lg.flooded;
-        $wireId = __wireId__:@s;
 
+        $wireId = __wireId__:@s;
+        
         // Check the gate type and do appropiate math
         switch (__gateType__:@s) {
             // Two Input AND gate
             case 0:
                 debug("AND");
-                debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}]); 
-                debug(["Bit 2: ", {"score":{"name":"@s","objective":"__bit2__"}}]); 
                 $bit := __bit1__:@s * __bit2__:@s; 
-                debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
-            
 
             // Two input NAND gate
             case 1:
+                debug("NAND");
                 $bit := (__bit1__:@s * __bit2__:@s) * -1 + 1;
-            
 
             // Two input NOR gate
             case 2:
+                debug("NOR");            
                 $bit := ((__bit1__:@s + __bit2__:@s) - (__bit1__:@s * __bit2__:@s)) * -1 + 1;
-            
 
             // NOT gate
             case 3:
                 debug("NOT");            
-                debug(["Bit: ", {"score":{"name":"@s","objective":"__bit1__"}}]); 
                 $bit := __bit1__:@s * -1 + 1; 
-                debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
             
 
             // Two input OR gate
             case 4:
-                debug ("OR"); 
+                debug("OR");
                 $bit := (__bit1__:@s + __bit2__:@s) - (__bit1__:@s * __bit2__:@s);
-            
 
             // Two input XNOR gate
             case 5:
+                debug("XNOR");
                 $bit = execute if score @s __bit1__ = @s __bit2__;
-            
 
             // Two input XOR gate
             case 6:
                 debug ("XOR"); 
-                debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}]);
-                $bit = execute unless score @s __bit1__ = @s __bit2__; 
-                debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
-            
+                $bit = execute unless score @s __bit1__ = @s __bit2__;             
         }
 
+        debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}, " | Previous bit 1: ", {"score":{"name":"@s","objective":"__prevBit1__"}}]); 
+        debug(["Bit 2: ", {"score":{"name":"@s","objective":"__bit2__"}}, " | Previous bit 2: ", {"score":{"name":"@s","objective":"__prevBit2__"}}]); 
+        debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+
+        if (__bit1__:@s = __prevBit1__:@s) {
+            __repeatBit__:@s = 2;
+        }
+        else if (__bit2__:@s = __prevBit2__:@s) {
+            __repeatBit__:@s = 1;
+        }
+
+        if (__prevBit1__:@s = __bit1__:@s && __prevBit2__:@s = __bit2__:@s) {
+            tag @s add lg.flooded;
+            tag @s remove lg.can_repeat;
+        } else {
+            tag @s remove lg.flooded;
+            tag @s add lg.can_repeat;
+        }
+
+
+        __prevBit1__:@s = __bit1__:@s;
+        __prevBit2__:@s = __bit2__:@s;
+
         // Check for connected gates with the same method as before
-        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,tag=!lg.flooded,predicate=mclg:matching_wire_id] at @s run {
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] at @s run {
             $gateId = __gateId__:@s;
 
-            execute as @n[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..0.26,predicate=mclg:matching_gate_id] run {
-                __ticks__:@s++;
-                
-                if (__ticks__:@s != __ticksNeeded__:@s) {
+            execute as @n[type=block_display,tag=lg.uiElement,tag=lg.gate_output,tag=!lg.flooded,distance=..0.26,predicate=mclg:matching_gate_id] run {  
+                __ticks__:@s++;              
+                if (entity @s[tag=lg.can_repeat] && __ticks__:@s > __ticksNeeded__:@s) {
+                    switch (__repeatBit__:@s) {
+                        case 1:
+                            __bit1__:@s = $bit;
+                            debug("Repeating Bit 1");
+                        case 2:
+                            __bit2__:@s = $bit;
+                            debug("Repeating Bit 2");
+                    }
+
+                    tag @s add lg.new_flood;
+                } else {
+                    if (__ticks__:@s != __ticksNeeded__:@s) {
                     execute run {
                         $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
                     } with [__ticks__:@s];
 
-                } else {
-                execute run {
-                        $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
-                        tag @s add lg.new_flood;
-                    } with [__ticks__:@s];
+                    } else {
+                    execute run {
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                            tag @s add lg.new_flood;
+                        } with [__ticks__:@s];
+                    }
                 }
             }
         }
 
         // Check for connected buffers with the same method as before
-        execute as @e[type=block_display,tag=lg.uiElement,tag=!lg.flooded,tag=lg.buffer,distance=..250,predicate=mclg:matching_wire_id] run {
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,distance=..250,predicate=mclg:matching_wire_id] run {
             if ($bit = 1) {@s::block_state.Properties.lit = "true";}
             if ($bit = 0) {@s::block_state.Properties.lit = "false";}
         }
