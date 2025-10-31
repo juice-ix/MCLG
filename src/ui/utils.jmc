@@ -16,19 +16,31 @@ function toggle_starter () {
 function toggle_bit () {
     $id = __playerId__:@s;
     execute at _highlight_ run {
-        $state = @n[tag=lg.buffer,distance=..0.001]::block_state.Properties.lit;
-        if ($state = 4) {
-            data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "false";
-            if (__bitmask__:@n[tag=lg.buffer,distance=..0.001] > 0) {
-                __packs__:$pack_0 -= __bitmask__:@n[tag=lg.buffer,distance=..0.001];
+        execute as @n[tag=lg.buffer,distance=..0.001] run {
+            $state = @s::block_state.Properties.lit;
+            if ($state = 4) {
+            data modify entity @s block_state.Properties.lit set value "false";
+
+            if (__bitmask__:@s > 0) {
+                execute as @n[tag=lg.buffer,distance=..0.001] run {
+                    __bit1__:@s = 0;
+                    __packs__:$pack_0 -= __bitmask__:@s;
+                }
+                
             }
         }
-        if ($state = 5) {
-            data modify entity @n[tag=lg.buffer,distance=..0.001] block_state.Properties.lit set value "true";
-            if (__bitmask__:@n[tag=lg.buffer,distance=..0.001]) {
-                __packs__:$pack_0 += __bitmask__:@n[tag=lg.buffer,distance=..0.001];
+            if ($state = 5) {
+                data modify entity @s block_state.Properties.lit set value "true";
+                
+                if (__bitmask__:@s) {
+                    execute as @s run {
+                        __bit1__:@s = 1;
+                        __packs__:$pack_0 += __bitmask__:@s;
+                    }
+                }
             }
         }
+        
     }
     
 }

@@ -1,20 +1,18 @@
 Scoreboard.add(__packs__);
-Scoreboard.add(__pack1__);
-Scoreboard.add(__pack2__);
-
-Scoreboard.add(__bitmask__);
+Scoreboard.add(__pack1__); Scoreboard.add(__pack2__);
+Scoreboard.add(__bitmask1__); Scoreboard.add(__bitmask2__);
 Scoreboard.add(__arrIndex__);
 
-@lazy function zzz_.compile.binary() {
-    compile::build[-1].input_1_bitmask = __bit1__:@s;
-    compile::build[-1].input_2_bitmask = __bit2__:@s;
+@lazy function compile.set_binary_inputs() {
+    compile::build[-1].input_1_bitmask = __bitmask1__:@s;
+    compile::build[-1].input_2_bitmask = __bitmask2__:@s;
 
     compile::build[-1].input_1_bitpack = __pack1__:@s;
     compile::build[-1].input_2_bitpack = __pack2__:@s;
 }
 
-@lazy function zzz_.compile.unary () {
-    compile::build[-1].input_bitmask = __bit1__:@s;
+@lazy function compile.set_unary_inputs () {
+    compile::build[-1].input_bitmask = __bitmask1__:@s;
     compile::build[-1].input_bitpack = __pack1__:@s;
 }
 
@@ -37,50 +35,57 @@ Scoreboard.add(__arrIndex__);
     execute run {$scoreboard players operation $pack_$(output_bitpack) __packs__ += $bit __variable__;} with compile::runtime[-1];
 }
 
+@lazy function compile.increase_index () {
+    $index++;
+
+    // Switch to the next bitpack when the index becomes greater than the allowed limit (30 because 2^31 > the integer limit)
+    if ($index = 31) {
+        $bitpack_id++;
+        $index = 0;
+        compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
+    }
+}
 
 function compile () {
     $id = __playerId__:@s;
     execute positioned as _highlight_ run { 
+
         // Remove old compiled data
         compile::build.del();
         compile::run.del();
         compile::runtime.del();
 
-        // Reset entity data
+        // Reset last run
+        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId,tag=lg.new_depth] remove lg.new_depth;
         __ticks__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId] = 0;
-        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.found] remove lg.found;
-        tag @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.new_depth] remove lg.new_depth;
-        scoreboard players reset @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,tag=!lg.starter,scores={__bitmask__=0..}] __bitmask__;
 
-        // Set components array
+        // Reset bitmasks
+        scoreboard players reset @e[type=block_display,tag=lg.uiElement,scores={__bitmask1__=0..}] __bitmask1__;
+        scoreboard players reset @e[type=block_display,tag=lg.uiElement,scores={__bitmask2__=0..}] __bitmask2__;
+
+        // Reset bitpacks
+        scoreboard players reset @e[type=block_display,tag=lg.uiElement,scores={__pack1__=0..}] __pack1__;
+        scoreboard players reset @e[type=block_display,tag=lg.uiElement,scores={__pack2__=0..}] __pack2__;
+
+        // Set previous scores to negative 1
+        __prevBit1__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId,scores={__prevBit1__=0..}] = -1;
+        __prevBit2__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId,scores={__prevBit2__=0..}] = -1;
+        __prevOutput__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250,tag=lg.hasWireId,scores={__prevOutput__=0..}] = -1;
+
+        // Values 2^0 ~ 2^30 in reverse order
         compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
 
-        // Reset variables and the initial pack
+        // REset starting data
         $index = -1;
         $bitpack_id = 1;
-        $iterations = -1;
         __packs__:$pack_0 = 0;
-
-        // Start
+        
         execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,tag=lg.starter,distance=..250] run {
-
-            $index++;
-            $iterations++;
-
-            // Switch to the next bitpack when the index becomes greater than the allowed limit (30 because 2^31 > the integer limit)
-            if ($index = 31) {
-                $bitpack_id++;
-                $index = 0;
-                compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
-            }
-
-            // Add found tag to ensure it's not detected again
-            tag @s add lg.found;
             $wireId = __wireId__:@s;
 
-           
+            compile.increase_index();
             compile::build << {};
-            
+
             // Store wire type and ID
             compile::build[-1].type = 7;
             compile::build[-1].wireId = $wireId;
@@ -92,245 +97,396 @@ function compile () {
             $bitmask = compile::exponents[-1];
 
             __bitmask__:@s = $bitmask;
-            __arrIndex__:@s = $iterations;
 
             // Store the value to pack, and the value to use when bit shifting the input bitpack
             // For input bits, they're the same value
             compile::build[-1].input_bitmask = $bitmask;
             compile::build[-1].output_bitmask = $bitmask;
 
-            // Pack the bitmask to the initial bitpack if it's enabled
-            $bit = @s::block_state.Properties.lit;
-            if ($bit = 4) {__packs__:$pack_0 += $bitmask;}
-
             compile::exponents[-1].del();
 
-            // Check for connected gate inputs
+            // Check whether the lamp is on (bit = 0) or the lamp is off (bit = 1)
+            $bit = @s::block_state.Properties.lit;
+            if ($bit = 4) {
+                __packs__:$pack_0 += $bitmask; 
+                __bit1__:@s = $bit = 1;
+            }
+            if ($bit = 5) {
+                __bit1__:@s = $bit = 0;
+                
+            }
+            debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+
+            // Find connected gate inputs
             execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] at @s run {
                 $gateId = __gateId__:@s;
+                
+                // Find the gate output(s)
+                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..0.26,predicate=mclg:matching_gate_id] run {
 
-                // Check for matching gate outputs
-                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,tag=!lg.found,distance=..0.26,predicate=mclg:matching_gate_id] run {
-                    // Store each input's bitmask and bitpack
+                    // Tick as many times as defined. Each tick sets a new bit scoreboard 
+                    // E.g. tick 1 = __bit1__, tick 2 = __bit2__
                     __ticks__:@s++;
                     if (__ticks__:@s != __ticksNeeded__:@s) {
                         execute run {
-                            $scoreboard players operation @s __bit$(0)__ = $bitmask __variable__;
                             $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
-
+                            $scoreboard players operation @s __bitmask$(0)__ = $bitmask __variable__;
+                            $scoreboard players operation @s __prevBit$(0)__ = $bit __variable__;
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
                         } with [__ticks__:@s];
 
                     } else {
-                        execute run {
-                            $scoreboard players operation @s __bit$(0)__ = $bitmask __variable__;
+                    execute run {
+                            $scoreboard players operation @s __bitmask$(0)__ = $bitmask __variable__;
                             $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
                             tag @s add lg.new_depth;
                         } with [__ticks__:@s];
                     }
                 }
             }
-
-            // Check for connected buffers
-            execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.buffer,tag=!lg.found,predicate=mclg:matching_wire_id] run {
-                scoreboard players operation @s __bit1__ = $bitmask __variable__;
-                scoreboard players operation @s __pack1__ = $bitpack_id __variable__;
-                tag @s add lg.new_depth;
-            }
         }
 
-        // If there are any conncted entites, continue
-        if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.found,tag=lg.new_depth,distance=..250]) {
+        // If any fully ticked gates were found, continue
+        if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=lg.new_depth,distance=..250]) {
             zzz_.compile.promote();
+            $index = -1;
+            $bitpack_id++;
+            compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
         } else {
-            for ($i = $iterations; $i > 0; $i--) {
+            debug ("Reversing array mclg:compile build ...");
+            @if (dbg) function output_initial_index () {
+                $curr_index = -1;
+            }
+            output_initial_index();
+            for ($i = compile::build; $i > -1; $i--) {
+                @if (dbg) function output_current_index () {
+                    $curr_index++;
+                }
+                output_current_index();
+                debug (["Setting Index ", {score:{name:"$i",objective:"__variable__"}}, " To Index ", {score:{name:"$curr_index",objective:"__variable__"}}]);
                 compile::run << compile::build[-1];
                 compile::build[-1].del();
             }
+            debug ("Reversed array output to mclg:compile run");
             compile::build.del();
         }
     }
 }
 
 function zzz_.compile.promote () {
-    
-    // Reset exponents array, index, and increment bitpack id by 1
-    compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
-    $index = -1;
-    $bitpack_id++;
-    execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=lg.new_depth,distance=..250] run {
-        $index++;
-        $iterations++;
+    execute as @e[type=block_display,tag=lg.uiElement,tag=lg.new_depth,distance=..250] run {
 
-        if ($index = 31) {
-            $bitpack_id++;
-            $index = 0;
-            compile::exponents = [1073741824,536870912,268435456,134217728,67108864,33554432,16777216,8388608,4194304,2097152,1048576,524288,262144,131072,65536,32768,16384,8192,4096,2048,1024,512,256,128,64,32,16,8,4,2,1];
+        compile.increase_index();
+        compile::build << {};
+
+        // Check the gate type and do appropiate math
+        switch (__gateType__:@s) {
+            // Two Input AND gate
+            case 0:
+                debug("AND");
+                $bit := __bit1__:@s * __bit2__:@s;
+
+                compile::build[-1].type = 0;
+                compile.set_binary_inputs();
+            // Two input NAND gate
+            case 1:
+                debug("NAND");
+                $bit := (__bit1__:@s * __bit2__:@s) * -1 + 1;
+
+                compile::build[-1].type = 1;
+                compile.set_binary_inputs();
+            // Two input NOR gate
+            case 2:
+                debug("NOR");            
+                $bit := ((__bit1__:@s + __bit2__:@s) - (__bit1__:@s * __bit2__:@s)) * -1 + 1;
+
+                compile::build[-1].type = 2;
+                compile.set_binary_inputs();
+            // NOT gate
+            case 3:
+                debug("NOT");            
+                $bit := __bit1__:@s * -1 + 1; 
+
+                compile::build[-1].type = 3;
+                compile.set_unary_inputs();
+            // Two input OR gate
+            case 4:
+                debug("OR");
+                $bit := (__bit1__:@s + __bit2__:@s) - (__bit1__:@s * __bit2__:@s);
+
+                compile::build[-1].type = 4;
+                compile.set_binary_inputs();
+            // Two input XNOR gate
+            case 5:
+                debug("XNOR");
+                $bit = execute if score @s __bit1__ = @s __bit2__;
+
+                compile::build[-1].type = 5;
+                compile.set_binary_inputs();
+            // Two input XOR gate
+            case 6:
+                debug ("XOR"); 
+                $bit = execute unless score @s __bit1__ = @s __bit2__;
+                
+                compile::build[-1].type = 6;
+                compile.set_binary_inputs();
         }
 
-        tag @s add lg.found;
+        debug(["Bit 1: ", {"score":{"name":"@s","objective":"__bit1__"}}, " | Previous bit 1: ", {"score":{"name":"@s","objective":"__prevBit1__"}}]); 
+        debug(["Bit 2: ", {"score":{"name":"@s","objective":"__bit2__"}}, " | Previous bit 2: ", {"score":{"name":"@s","objective":"__prevBit2__"}}]); 
+        debug(["Output: ", {"score":{"name":"$bit","objective":"__variable__"}}]);
+
         tag @s remove lg.new_depth;
         $wireId = __wireId__:@s;
 
-        compile::build << {};
-        
-        // Store bitmask, bitpack, type, and if it's a lamp, wire ID
-        if (entity @s[tag=lg.buffer]) {
-            compile::build[-1].type = 7;
-            compile::build[-1].wireId = __wireId__:@s;
-            zzz_.compile.unary();
-        } else {
-            switch (__gateType__:@s) {
-                case 0:
-                    compile::build[-1].type = 0;
-                    zzz_.compile.binary();
-                case 1:
-                    compile::build[-1].type = 1;
-                    zzz_.compile.binary();
-                case 2:
-                    compile::build[-1].type = 2;
-                    zzz_.compile.binary();
-                case 3:
-                    compile::build[-1].type = 3;
-                    zzz_.compile.unary();
-                case 4:
-                    compile::build[-1].type = 4;
-                    zzz_.compile.binary();
-                case 5:
-                    compile::build[-1].type = 5;
-                    zzz_.compile.binary();
-                case 6:
-                    compile::build[-1].type = 6;
-                    zzz_.compile.binary();
-            }
-        }
-        
         // Store the output bitpack
         compile::build[-1].output_bitpack = $bitpack_id;
 
         // Store the value to output into the bitpack
         $bitmask = compile::exponents[-1];
         compile::build[-1].output_bitmask = $bitmask;
-
         compile::exponents[-1].del();
+        
+        if ($bit = __prevOutput__:@s) {
+            tag @s remove lg.can_repeat;
+            __ticks__:@s = 2;
+        } else {
+            tag @s add lg.can_repeat;
 
-        // Check for connected gate inputs
-        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] at @s run {
-            $gateId = __gateId__:@s;
-            
-            // Check for matching gate outputs
-            execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,tag=!lg.found,distance=..0.26,predicate=mclg:matching_gate_id] run {
+            if (__bit1__:@s = __prevBit1__:@s) {__repeatBit__:@s = 2;}
+            else if (__bit2__:@s = __prevBit2__:@s) {__repeatBit__:@s = 1;}
 
-                // Store each input's bitmask and bitpack
-                __ticks__:@s++;
-                if (__ticks__:@s != __ticksNeeded__:@s) {
-                    execute run {
-                        $scoreboard players operation @s __bit$(0)__ = $bitmask __variable__;
-                        $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
+            // Check for connected gates with the same method as before
+            execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] at @s run {
+                $gateId = __gateId__:@s;
 
-                    } with [__ticks__:@s];
+                execute as @n[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..0.26,predicate=mclg:matching_gate_id] run {  
+                    __ticks__:@s++;              
+                    if (entity @s[tag=lg.can_repeat] && __ticks__:@s > __ticksNeeded__:@s) {
+                        switch (__repeatBit__:@s) {
+                            case 1:
+                                __bitmask1__:@s = $bitmask;
+                                __pack1__:@s = $bitpack_id;
+                                __bit1__:@s = $bit;
+                                debug("Repeating Bit 1");
+                            case 2:
+                                __bitmask2__:@s = $bitmask;
+                                __pack2__:@s = $bitpack_id;
+                                __bit2__:@s = $bit;
+                                debug("Repeating Bit 2");
+                        }
 
-                } else {
-                    execute run {
-                        $scoreboard players operation @s __bit$(0)__ = $bitmask __variable__;
-                        $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
                         tag @s add lg.new_depth;
-                    } with [__ticks__:@s];
+                    } else {
+                        if (__ticks__:@s != __ticksNeeded__:@s) {
+                        execute run {
+                            $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
+                            $scoreboard players operation @s __bitmask$(0)__ = $bitmask __variable__;
+                            $scoreboard players operation @s __prevBit$(0)__ = $bit __variable__;
+                            $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                        } with [__ticks__:@s];
+
+                        } else {
+                        execute run {
+                                 $scoreboard players operation @s __pack$(0)__ = $bitpack_id __variable__;
+                                $scoreboard players operation @s __bitmask$(0)__ = $bitmask __variable__;
+                                $scoreboard players operation @s __bit$(0)__ = $bit __variable__;
+                                tag @s add lg.new_depth;
+                            } with [__ticks__:@s];
+                        }
+                    }
                 }
             }
+           
         }
 
-        // Check for connected buffers
-        execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.buffer,tag=!lg.found,predicate=mclg:matching_wire_id] run {
-            scoreboard players operation @s __bit1__ = $bitmask __variable__;
-            scoreboard players operation @s __pack1__ = $bitpack_id __variable__;
-            tag @s add lg.new_depth;
+         //Check for connected buffers using wire ID, then add them to the storage
+        execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,distance=..250,predicate=mclg:matching_wire_id] run {
+            compile::build << {};
+            compile::build[-1].type = 8;
+            compile::build[-1].wireId = $wireId;   
         }
+
+        __prevBit1__:@s = __bit1__:@s;
+        __prevBit2__:@s = __bit2__:@s;
+        __prevOutput__:@s = $bit;
     }
-    // If there are any conncted entites, continue
-    if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.found,tag=lg.new_depth,distance=..250]) {
+
+    // If there are any conncted gates, loop
+    if (entity @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=lg.new_depth]) {
         zzz_.compile.promote();
     } else {
-            for ($i = $iterations; $i > -1; $i--) {
-                compile::run << compile::build[-1];
-                compile::build[-1].del();
-            }
-            compile::build.del();
+        debug (["Reversing storage array ", {color: gold, text:"mclg"}, ":", {color: aqua, text:"compile"}, {color: red, text:" build"}]);
+        @if (dbg) function output_initial_index () {
+            $curr_index = -1;
         }
+        output_initial_index();
+        for ($i = compile::build; $i > -1; $i--) {
+            @if (dbg) function output_current_index () {
+                $curr_index++;
+            }
+            output_current_index();
+            debug (["Setting Index ", {score:{name:"$i",objective:"__variable__"}}, " from mclg:compile build to Index ", {score:{name:"$curr_index",objective:"__variable__"}}, " in mclg:compile run"]);
+            compile::run << compile::build[-1];
+            compile::build[-1].del();
+        }
+        debug (["Reversed storage array output to storage ", {color: gold, text:"mclg"}, ":", {color: aqua, text:"compile"}, {color: red, text:" run"}]);
+        compile::build.del();
+    }
 }
-
 
 function run_compiled () {
     $id = __playerId__:@s;
     execute positioned as _highlight_ run {
+        // Store the initial starting pack
         $temp_pack0 = __packs__:$pack_0;
+
+        // Reset all other packs
         scoreboard objectives remove __packs__;
         scoreboard objectives add __packs__ dummy;
+
+        // Set the initial pack back
         __packs__:$pack_0 = $temp_pack0;
         compile::runtime = compile::run;
-
-        for ($i = $iterations; $i > -1; $i--) {
+        scoreboard objectives setdisplay sidebar __packs__;
+        for ($i = compile::run; $i > 0; $i--) {
             $type = compile::runtime[-1].type;
             switch ($type) {
                 // AND
                 case 0:    
+                    say "hi";
                     run_compiled.binary.set_bits();
-                    $bit := $bit_1 * $bit_2 * {compile::runtime[-1].output_bitmask};
+                    $real_bit := $bit_1 * $bit_2;
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("AND");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
                     run_compiled.pack();
                 
                 // NAND
                 case 1:
                     run_compiled.binary.set_bits();
-                    $bit := (($bit_1 * $bit_2) * -1 + 1) * {compile::runtime[-1].output_bitmask};
+                    $real_bit := (($bit_1 * $bit_2) * -1 + 1);
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("NAND");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
                     run_compiled.pack();
 
                 // NOR
                 case 2:
                     run_compiled.binary.set_bits();
-                    $bit := ((($bit_1 + $bit_2) - ($bit_1 * $bit_2)) * -1 + 1) * {compile::runtime[-1].output_bitmask};
+                    $real_bit := (($bit_1 + $bit_2) - ($bit_1 * $bit_2)) * -1 + 1;
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("NOR");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+                    
                     run_compiled.pack();
                 
                 // NOT
                 case 3:
                     run_compiled.unary.set_bit();
-                    $bit := ($bit * -1 + 1) * {compile::runtime[-1].output_bitmask};
+                    $real_bit := ($bit * -1 + 1);
+
+                    debug("NOT");
+                    debug(["Bit: ", {"score":{"name":"$bit","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+                    
                     run_compiled.pack();
                 
                 // OR
                 case 4:
                     run_compiled.binary.set_bits();
-                    $bit := (($bit_1 + $bit_2) - ($bit_1 * $bit_2)) * {compile::runtime[-1].output_bitmask};
+                    $real_bit := (($bit_1 + $bit_2) - ($bit_1 * $bit_2));
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("OR");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
                     run_compiled.pack();
 
                 // XNOR
                 case 5:
                     run_compiled.binary.set_bits();
-                    $bit ?= execute if score $bit_1 __variable__ = $bit_2 __variable__;
-                    $output_bitmask = compile::runtime[-1].output_bitmask;
-                    $bit *= $output_bitmask;
+                    $real_bit ?= execute if score $bit_1 __variable__ = $bit_2 __variable__;
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("XNOR");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
                     run_compiled.pack();
                 
                 // XOR
                 case 6:
                     run_compiled.binary.set_bits();
-                    $bit ?= execute unless score $bit_1 __variable__ = $bit_2 __variable__;
-                    $output_bitmask = compile::runtime[-1].output_bitmask;
-                    $bit *= $output_bitmask;
+                    $real_bit ?= execute unless score $bit_1 __variable__ = $bit_2 __variable__;
+                    $bit := $real_bit * {compile::runtime[-1].output_bitmask};
+
+                    debug("XOR");
+                    debug(["Bit 1: ", {"score":{"name":"$bit_1","objective":"__variable__"}}]); 
+                    debug(["Bit 2: ", {"score":{"name":"$bit_2","objective":"__variable__"}}]); 
+                    debug(["Output: ", {"score":{"name":"$real_bit","objective":"__variable__"}}]);
+
                     run_compiled.pack();
                 
-                // Buffer
+                // Input buffer
                 case 7:
                     run_compiled.unary.set_bit();
                     $wireId = compile::runtime[-1].wireId;
                     execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,predicate=mclg:matching_wire_id,distance=..250] run {
                         if ($bit = 0) {
+                            debug("Input Lamp: Set bit to 0");
                             @s::block_state.Properties.lit = 'false'; 
                         } else {
+                            debug("Input Lamp: Set bit to 1");
                             @s::block_state.Properties.lit = 'true'; 
                         }
                     }    
 
                     $bit := $bit * {compile::runtime[-1].output_bitmask};
-                    run_compiled.pack();                    
+                    run_compiled.pack();  
+
+                // Regular buffer
+                case 8:
+                    $wireId = compile::runtime[-1].wireId;
+                    execute as @e[type=block_display,tag=lg.uiElement,tag=lg.buffer,predicate=mclg:matching_wire_id,distance=..250] run {
+
+                        if ($real_bit = 0  && __bit1__:@s = 1) {
+                            debug("Output Lamp: Set bit to 0");
+                            @s::block_state.Properties.lit = 'false'; 
+
+                            if (entity @s[tag=lg.starter]) {
+                                __packs__:$pack_0 -= __bitmask__:@s;
+                            }
+                            
+                            
+                        } else if ($real_bit = 1 && __bit1__:@s = 0){
+                            debug("Output Lamp: Set bit to 1");
+                            @s::block_state.Properties.lit = 'true';
+
+                            if (entity @s[tag=lg.starter]) {
+                                __packs__:$pack_0 += __bitmask__:@s;
+                            }
+                        }
+
+                        __bit1__:@s = $real_bit;
+                    }
             } 
             compile::runtime[-1].del();
         }
