@@ -535,14 +535,14 @@ if (!data storage mclg:ui element_info) {
     };
 }
 
-Scoreboard.add(__wireId__);
+Scoreboard.add(__wireId__); Scoreboard.add(__wireId2__);
+
 Scoreboard.add(__gateId__);
 Scoreboard.add(__gateType__); __gateType__:@a ??= 0;
 Scoreboard.add(__gateOrientation__); __gateOrientation__:@a ??= 0;
 Scoreboard.add(__stairRotation__); __stairRotation__:@a ??= 0;
 Scoreboard.add(__rodRotation__); __rodRotation__:@a ??= 0;
 Scoreboard.add(__wireType__);
-Scoreboard.add(__ticksNeeded__);
 
 Scoreboard.add(__pos0__);
 Scoreboard.add(__pos1__);
@@ -598,6 +598,7 @@ class zzz_.ui.place {
     @lazy function set_wireId() {
         $max = 0;
         $max > __wireId__:@e[type=block_display,tag=lg.hasWireId];
+        $max > __wireId2__:@e[type=block_display,tag=lg.hasWireId];
         $max++;
         __wireId__:@s = $max;
     }
@@ -681,6 +682,7 @@ class zzz_.ui.place {
         summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         
         this.set_gateId();
+        $max_gate_id = $max;
         __gateType__:@s = $type;
         execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.26,limit=2] run {
             __wireType__:@s = 5;
@@ -696,7 +698,7 @@ class zzz_.ui.place {
             }
 
             rotate @s ~ ~;
-            __gateId__:@s = $max;
+            __gateId__:@s = $max_gate_id;
             tag @s remove lg.gate_temp;
 
             execute at @s run zzz_.bfs.backward.get_type();
@@ -706,13 +708,14 @@ class zzz_.ui.place {
         summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         this.set_gateId();
+        $max_gate_id = $max;
         __gateType__:@s = $type;
         execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.25,limit=2] run {
             __pos0__:@s = @s::Pos[0] * 100;
             __pos1__:@s = __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
             __pos2__:@s = @s::Pos[2] * 100;
             rotate @s ~ ~;
-            __gateID__:@s = $max;
+            __gateId__:@s = $max_gate_id;
             tag @s remove lg.gate_temp;
         }
     }
@@ -722,31 +725,37 @@ class zzz_.ui.place {
         execute if entity @s[tag=lg.starter] run tag @s remove lg.starter;
         if (!__pp0__:@p[tag=lg.saving,distance=..250] = __pp3__:@p[tag=lg.saving,distance=..250]) {$relPos_x := {@s::Pos[0] * 100} - $chipStart_x;} 
         else {$relPos_x := {@s::Pos[2] * 100} - $chipStart_z;}
+        $relPos_y := {@s::Pos[1] * 100} - $chipStart_y; 
         
         if ($yaw = 270 || $yaw = 180) {
             $relPos_x *= -1;
         }
 
+        chip::build.info.CustomName.del();
+        chip::build.info.wireType.del();
+        chip::build.info.rel_id.del();
+        chip::build.info.rotation.del();
+        chip::build.info.gateType.del();
+        chip::build.info.connectedWireId.del();
+        
         if (entity @s[tag=lg.wire] || entity @s[tag=lg.gate]) {
             chip::build.info.CustomName = @s::CustomName;
             chip::build.info.wireType = __wireType__:@s;
-        } else if (data storage mclg:chip build.info.wireType) {
-            chip::build.info.wireType.del();
-            chip::build.info.CustomName.del();
+        }
+        if (entity @s[tag=lg.hasWireId]) {
+
+            $relId_wire_1 = __wireId__:@s;
+            $relId_wire_2 = __wireId2__:@s;
+            $relId_wire_1 -= $min_wireId;
+            $relId_wire_2 -= $min_wireId;
+            chip::build.info.rel_id.wire.1 = $relId_wire_1;
+            chip::build.info.rel_id.wire.2 = $relId_wire_2;
 
         } 
-        if (entity @s[tag=lg.hasWireId]) {
-            $relId_wire = __wireId__:@s;
-            $relId_wire -= $min_wireId;
-            chip::build.info.rel_id.wire = $relId_wire;
-        } else if (data storage mclg:chip build.info.rel_id) {
-            chip::build.info.rel_id.del();
-        }
         if (entity @s[tag=lg.gate]) {
             $relId_gate = __gateId__:@s;
             $relId_gate -= $min_gateId;
             chip::build.info.rel_id.gate = $relId_gate;
-
         } 
 
         if (entity @s[tag=lg.rod]) {
@@ -755,16 +764,19 @@ class zzz_.ui.place {
             chip::build.info.rotation = __stairRotation__:@s;
         } else if (entity @s[tag=lg.gate_output]) {
             chip::build.info.gateType = __gateType__:@s;
-            chip::build.info.gateTicks = __ticksNeeded__:@s;
-        } else if (data storage mclg:chip build.info.rotation) {
-            chip::build.info.rotation.del();
-        } else if (data storage mclg:chip build.info.gateType) {
-            chip::build.info.gateType.del();
-            chip::build.info.gateTicks.del();
+
+            $relId_connectedWire1 = __connectedWireId1__:@s;
+            $relId_connectedWire2 = __connectedWireId2__:@s;
+            $relId_connectedWire1 -= $min_wireId;
+            $relId_connectedWire2 -= $min_wireId;
+            chip::build.info.rel_id.connectedWire.1 = $relId_connectedWire1;
+            chip::build.info.rel_id.connectedWire.2 = $relId_connectedWire2;
+        } else if (entity @s[tag=lg.buffer]) {
+            $relId_connectedWire1 = __connectedWireId1__:@s;
+            $relId_connectedWire1 -= $min_wireId;
+            chip::build.info.rel_id.connectedWire.1 = $relId_connectedWire1;
         }
         
-        $relPos_y := {@s::Pos[1] * 100} - $chipStart_y; 
-
         chip::build.info.Tags = @s::Tags;
         chip::build.info.block_state = @s::block_state;
         chip::build.info.rel_pos.x = 0.01 * (float) $relPos_x;
@@ -851,12 +863,24 @@ class zzz_.ui.place {
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:redstone_lamp){
                         this.apply_data.buffer();
                         zzz_.bfs.backward.get_type();
+                        if (!__wireId2__:@s > 0) {
+                            $max = 0;
+                            execute as @e[type=block_display,tag=lg.hasWireId] run {
+                                $max > __wireId__:@s;
+                                $max > __wireId2__:@s;
+                            }
+                            $max++;
+                            __wireId2__:@s = $max;
+                        }
+                        __output__:@s = 0;
 
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:sea_lantern) {
                         @s::Tags = ui::element_info.gate.tags;
+                        __connectedWireId1__:@s = 0;
+                        __connectedWireId2__:@s = 0;
                         __wireType__:@s = 4;
                         this.set_wireId();
-                        __ticksNeeded__:@s = 2;
+                        __wireId2__:@s = __wireId__:@s;
                         switch (__gateType__:@p[tag=lg.placing]) {
                             //AND
                             case 0:
@@ -886,9 +910,18 @@ class zzz_.ui.place {
                             case 3:
                                 @s::block_state.Name = "red_wool";
                                 tag @s add lg.gate_input;
-                                __ticksNeeded__:@s = 1;
                                 __gateType__:@s = 3;
                                 zzz_.bfs.backward.get_type();
+                               if (!__wireId2__:@s > 0) {
+                                    $max = 0;
+                                    execute as @e[type=block_display,tag=lg.hasWireId] run {
+                                        $max > __wireId__:@s;
+                                        $max > __wireId2__:@s;
+                                    }
+                                    $max++;
+                                    __wireId2__:@s = $max;
+                                }
+
                             //OR
                             case 4:
                                 switch (__gateOrientation__:@p[tag=lg.placing]) {
@@ -918,6 +951,7 @@ class zzz_.ui.place {
                         }
 
                     }
+
                     else {tag @s add lg.uiElement;}
                 }
                 tag @s remove lg.placing;
@@ -966,8 +1000,8 @@ class zzz_.ui.place {
                     execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.gate] run {
                         $min_gateId < __gateId__:@s;
                     }
-                    execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.hasWireId] run {
-                        $min_wireId < __wireId__:@s;
+                    execute as @e[type=block_display,tag=lg.uiElement,tag=!lg.gate_input,distance=..250,tag=lg.hasWireId] run {
+                        $min_wireId < __wireId2__:@s;
                     }
                     $min_gateId--;
                     $min_wireId--;
@@ -1008,7 +1042,7 @@ class zzz_.ui.place {
                 $place = 0;
                 $max_gateId = 0;
                 $max_wireId = 0;
-                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId__:@s;
+                execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId2__:@s;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate,distance=..250] run $max_gateId > __gateId__:@s;
                     
                 for ($i = chip::place.arrs; $i > 0; $i--) {
@@ -1026,8 +1060,15 @@ class zzz_.ui.place {
                             } else if (entity @s[tag=lg.stair]) {
                                 __stairRotation__:@s = chip::place.arrs[-1][-1].rotation;
                             } else if (entity @s[tag=lg.gate]) {
-                                __gateType__:@s = chip::place.arrs[-1][-1].gateType;
-                                __ticksNeeded__:@s = chip::place.arrs[-1][-1].gateTicks;
+                                __gateId__:@s := {chip::place.arrs[-1][-1].rel_id.gate} + $max_gateId;
+
+                                if (entity @s[tag=lg.gate_output]) {
+                                    __gateType__:@s = chip::place.arrs[-1][-1].gateType;
+                                    __connectedWireId1__:@s := {chip::place.arrs[-1][-1].rel_id.connectedWire.1} + $max_wireId;
+                                    __connectedWireId2__:@s := {chip::place.arrs[-1][-1].rel_id.connectedWire.2} + $max_wireId;
+                                }
+                            } else if (entity @s[tag=lg.buffer]) {
+                                __connectedWireId1__:@s := {chip::place.arrs[-1][-1].rel_id.connectedWire.1} + $max_wireId;
                             }
                             if (entity @s[tag=lg.permaStarter,tag=lg.buffer]) {tag @s add lg.starter;}
                             execute run {
@@ -1048,11 +1089,10 @@ class zzz_.ui.place {
                                 }
                             tag @s remove lg.chip_placing;
                             
-                            if (data storage mclg:chip place.arrs[-1][-1].rel_id.wire) {
-                                __wireId__:@s := {chip::place.arrs[-1][-1].rel_id.wire} + $max_wireId;
-                            }
-                            if (data storage mclg:chip place.arrs[-1][-1].rel_id.gate) {
-                                __gateId__:@s := {chip::place.arrs[-1][-1].rel_id.gate} + $max_gateId;
+                            if (entity @s[tag=lg.hasWireId]) {
+                                __wireId__:@s := {chip::place.arrs[-1][-1].rel_id.wire.1} + $max_wireId;
+                                __wireId2__:@s := {chip::place.arrs[-1][-1].rel_id.wire.2} + $max_wireId;
+                                
                             }
                         }
                         chip::place.arrs[-1][-1].del();

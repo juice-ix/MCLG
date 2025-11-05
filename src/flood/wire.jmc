@@ -324,15 +324,16 @@ class bfs.forward {
     }
 } 
 
+Scoreboard.add(__connectedWireId1__); Scoreboard.add(__connectedWireId2__);
 class zzz_.bfs {
 
     @lazy function rod (dirX,dirY,flood_direction,predicate) {
         tag @s add lg.searched;
         tag @n[type=block_display,tag=lg.bulb,distance=..0.001] add lg.searched;
-        execute positioned ^$dirX ^$dirY ^ as @n[type=block_display,distance=..0.001,tag=!lg.searched,predicate=mclg:bfs/$flood_direction/$predicate] run {
+        execute positioned ^$dirX ^$dirY ^ as @n[type=block_display,distance=..0.001,tag=!lg.searched,tag=!lg.removing,predicate=mclg:bfs/$flood_direction/$predicate] run {
             this.$flood_direction.get_type();
         }
-        execute positioned ^$dirX ^$dirY ^ if entity @n[type=block_display,distance=..0.001,tag=!lg.searched,tag=lg.bulb] run {
+        execute positioned ^$dirX ^$dirY ^ if entity @n[type=block_display,distance=..0.001,tag=!lg.searched,tag=!lg.removing,tag=lg.bulb] run {
             this.$flood_direction.bulb_skip({"dirX":$dirX,"dirY":$dirY,"predicate":"$predicate"});
         }
     }
@@ -343,19 +344,19 @@ class zzz_.bfs {
 
     function backward.bulb_skip () {
         debug("[Backward]: Skip");
-        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,predicate=mclg:bfs/backward/$(predicate),distance=..0.001] at @s run {
+        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,tag=!lg.removing,predicate=mclg:bfs/backward/$(predicate),distance=..0.001] at @s run {
             this.backward.get_type();
         }
-        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,distance=..0.001] run function mclg:zzz_/bfs/backward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
+        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,tag=!lg.removing,distance=..0.001] run function mclg:zzz_/bfs/backward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
     }
 
     function forward.bulb_skip () {
         debug("[Forward]: Skip");
         tag @n[type=block_display,tag=lg.bulb,distance=..0.001] add lg.searched;
-        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,predicate=mclg:bfs/forward/$(predicate),distance=..0.001] at @s run {
+        $execute positioned ^$(dirX) ^$(dirY) ^ as @n[type=block_display,tag=!lg.searched,tag=!lg.removing,predicate=mclg:bfs/forward/$(predicate),distance=..0.001] at @s run {
             this.forward.get_type();
         }
-        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,distance=..0.001] run function mclg:zzz_/bfs/forward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
+        $execute positioned ^$(dirX) ^$(dirY) ^ if entity @n[type=block_display,tag=lg.bulb,tag=!lg.searched,tag=!lg.removing,distance=..0.001] run function mclg:zzz_/bfs/forward/bulb_skip {"dirX":$(dirX),"dirY":$(dirY),"predicate":"$(predicate)"};
     }
 
     function forward.get_type () {
@@ -426,32 +427,33 @@ class zzz_.bfs {
                 break;
 
             case 4:
-                this.rod(-0.25,0,forward,wte);
-                this.rod(0,-0.25,forward,nts);
-                this.rod(0.25,0,forward,etw);
-                this.rod(0,0.25,forward,stn);
 
                 debug("-_-_-_-_-_- Found Output: Buffer -_-_-_-_-_-");
-                __wireId__:@s = $id;
+                if (!__wireId2__:@s > 0) {
+                    $max++;
+                    __wireId2__:@s = $max;
+                }
+                
+                __wireId__:@s = $wireId;
+                __connectedWireId1__:@s = $wireId;
 
-                execute positioned ^ ^0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^-0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^ ^-0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
-
-                execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
-                execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
-                execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
-                execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
-
+                tag @s add lg.wireFloodQueue;
                 break;
             case 5:
-                debug("-_-_-_-_-_- Found Output: Gate -_-_-_-_-_-");
-                __wireId__:@s = $id;
+                debug("-_-_-_-_-_- Found Output: Gate Input -_-_-_-_-_-");
+                __wireId__:@s = $wireId;
+                $gateId = __gateId__:@s;
+
+                execute as @e[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
+                    if ($starter) {tag @s add lg.startsFlood;}
+                    if (__connectedWireId1__:@s < 1) {
+                        __connectedWireId1__:@s = $wireId;
+                    } else if (__connectedWireId2__:@s < 1) {
+                        __connectedWireId2__:@s = $wireId;
+                    }
+                       
+                }
+                
                 break;
         }
                 
@@ -551,31 +553,92 @@ class zzz_.bfs {
                 this.rod(0,-0.25,backward,stn);
                 this.rod(0.25,0,backward,wte);
                 
-                debug("-_-_-_-_-_- Found Input -_-_-_-_-_-");
-                tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched] remove lg.searched;
-                tag @s add lg.searched;
-                $id = __wireId__:@s;
-                $gate_id = __gateId__:@s;
-                execute positioned ^ ^0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^-0.25 ^ ^ as @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); break;
-                execute positioned ^ ^-0.25 ^ as @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] 
-                unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
+                if (entity @s[tag=!lg.wireFloodQueue]) {
+                    debug("-_-_-_-_-_- Found Input -_-_-_-_-_-");
+                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched] remove lg.searched;
+                    tag @s add lg.searched;
+                    $wireId = __wireId2__:@s;
 
-                execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
-                execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
-                execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
-                execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
-                break;
+                    $max = 0;
+                    execute as @e[type=block_display,tag=lg.hasWireId,tag=!lg.searched] run {
+                        $max > __wireId2__:@s;
+                        $max > __wireId__:@s;
+                    }
+                    __wireId__:@e[type=block_display,tag=!lg.searched,tag=!lg.gate_output,distance=..250,predicate=mclg:matching_wire_id] = 0;
+
+                    execute as @e[type=block_display,tag=!lg.searched,distance=..250,predicate=mclg:is_connected] run {
+                        if (__connectedWireId1__:@s = $wireId) { __connectedWireId1__:@s = 0;} 
+                        else if (__connectedWireId2__:@s = $wireId) {__connectedWireId2__:@s = 0;}
+                    }
+                    
+                    if (entity @s[tag=lg.starter]) {
+                        $starter = true;
+                        tag @e[type=block_display,tag=!lg.searched,distance=..250,predicate=mclg:is_connected] remove lg.startsFlood;
+                    } else {$starter = false;}
+
+                    if (entity @s[tag=!lg.removing]) {
+
+                        $gate_id = __gateId__:@s;
+                        execute positioned ^ ^0.25 ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/stn,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^0.25 ^ ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/etw,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^-0.25 ^ ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/wte,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^ ^-0.25 ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/nts,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
+
+                        execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
+                        execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
+                        execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
+                        execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
+                    }
+
+                }
+                
+                while (entity @e[tag=lg.wireFloodQueue]) {
+                    execute as @n[type=block_display,tag=lg.wireFloodQueue,distance=..250] at @s run {
+                        tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched] remove lg.searched;
+                        tag @s add lg.searched;
+                        tag @s remove lg.wireFloodQueue;
+                        
+                        $wireId = __wireId2__:@s;
+
+                        $max = 0;
+                        execute as @e[type=block_display,tag=lg.hasWireId,tag=!lg.searched] run {
+                            $max > __wireId2__:@s;
+                            $max > __wireId__:@s;
+                        }
+                        __wireId__:@e[type=block_display,tag=!lg.searched,tag=!lg.gate_output,tag=!lg.wireFloodQueue,distance=..250,predicate=mclg:matching_wire_id] = 0;
+
+                        execute as @e[type=block_display,tag=!lg.searched,distance=..250,predicate=mclg:is_connected] run {
+                            if (__connectedWireId1__:@s = $wireId) { __connectedWireId1__:@s = 0;} 
+                            else if (__connectedWireId2__:@s = $wireId) {__connectedWireId2__:@s = 0;}
+                        }
+
+                        $gate_id = __gateId__:@s;
+                        execute positioned ^ ^0.25 ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/stn,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^0.25 ^ ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/etw,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^-0.25 ^ ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/wte,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type();
+                        execute positioned ^ ^-0.25 ^ as @n[type=block_display,tag=!lg.removing,predicate=mclg:bfs/forward/nts,distance=..0.001] 
+                        unless score @s __gateId__ = $gate_id __variable__ run this.forward.get_type(); 
+
+                        execute positioned ^ ^0.25 ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:stn});
+                        execute positioned ^0.25 ^ ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:etw});
+                        execute positioned ^ ^-0.25 ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
+                        execute positioned ^-0.25 ^ ^ if entity @n[type=block_display,tag=!lg.removing,tag=lg.bulb,distance=..0.001] run this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:wte});
+                    }
+                }
+                
             // Gate input
             case 5:
-                execute positioned ^0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^-0.25 ^ ^ run {this.rod(0.25,0,backward,wte);} break;
-                execute positioned ^-0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^0.25 ^ ^ run {this.rod(-0.25,0,backward,etw);} break;
-                execute positioned ^ ^0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^ ^-0.25 ^ run {this.rod(0,0.25,backward,nts);} break;
-                execute positioned ^ ^-0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,distance=..0.001] positioned ^ ^0.25 ^ run {this.rod(0,-0.25,backward,stn);}
+                execute positioned ^0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,tag=!lg.removing,distance=..0.001] positioned ^-0.25 ^ ^ run {this.rod(0.25,0,backward,wte);} break;
+                execute positioned ^-0.25 ^ ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,tag=!lg.removing,distance=..0.001] positioned ^0.25 ^ ^ run {this.rod(-0.25,0,backward,etw);} break;
+                execute positioned ^ ^0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,tag=!lg.removing,distance=..0.001] positioned ^ ^-0.25 ^ run {this.rod(0,0.25,backward,nts);} break;
+                execute positioned ^ ^-0.25 ^ unless entity @n[type=block_display,tag=lg.gate_output,distance=..0.001] if entity @n[type=block_display,tag=lg.wire,tag=!lg.removing,distance=..0.001] positioned ^ ^0.25 ^ run {this.rod(0,-0.25,backward,stn);}
                 break;
         }
     }

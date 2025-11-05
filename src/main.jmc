@@ -29,8 +29,10 @@ import "flood/compiled";
 import "flood/id";
 import "flood/wire";
 
-import "items";
+//import "items";
+
 
 $uiSize ??= 500;
 $chipId ??= -2147483600;
 $maxChipBlocksPerTick = 100;
+$idFloodCycleLimit ??= 10000;

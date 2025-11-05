@@ -234,7 +234,16 @@ class zzz_.ui.remove {
         __crp__:@s = -1;
         $id = __playerId__:@s;
 
-        execute at _highlight_ run kill _uiElement_;
+        execute at _highlight_ as @n[type=block_display, tag=lg.uiElement, distance=..0.001] at @s run {
+            tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+            tag @s add lg.removing;
+
+            if (__wireType__:@s > -1) {
+                zzz_.bfs.backward.get_type();
+                
+            }            
+            kill @s;
+        } 
         Advancement.revoke(@s, only, remove_uielement/single);
     }
 
