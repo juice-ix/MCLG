@@ -32,11 +32,10 @@ Allows wires to perpendicularly cross over eachother.
 Splits a wire into at most 3 directions.
 
 ### Redstone Lamp
-Holds a bit in a state of on or off.
+Holds a bit in a state of on or off. When placed as an output, delays propagation by 1 cycle.
 
 ### Sea Lantern
-This acts as a block for all gate types. By default, there are 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT).
-It is possible to manually add gate types with varying numbers of inputs.
+This acts as a block for all gate types, and a select few circuits. By default, there are 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT). Since sequential circuits aren't supported, there area also T flip flops, D flip flops, and JK flip flops.
 
 ## Saving Circuits
 You can use shulkers boxes to save an area of element positions and data relative to a point. To do this, simply right click two points while not sprinting with a shulker box in your mainhand. This will give you a number of shulker boxes.
@@ -49,23 +48,6 @@ Once you've linked your inputs and outputs, you can run them.
 On your initial starting bits (latnerns), run `/function mclg:toggle_starter`. You can also do this in bulk with `execute as <target entities> run function mclg:toggle_starters`. 
 Then, you can use either use the command `/function mclg:id_flood` to do one quick but slower run, or compile them with `/function mclg:compile`, then run `/function mclg:storage_flood` for a faster but less variable version.
   - If you compile it, any modifications require recompiling before running again.
-
-
-## Adding Gates
-The easiest way to add gates is to modify the source datapack using JMC:
-- Inside of `src/ui/modify/place`:
-  - If your new gate has > 2 inputs, you will need to new lazy functions to place the extra input, both horizontally and vertically, and possibly outuput blocks.
-    - Use the functions `apply_data.gates.vertical` and `apply_data.gates.horizontal` for reference on how to place the input blocks.
-  - Occasionally, gates with > 2 inputs need to have an extra bit before doing math. Simply add the scoreboard `__bit<x>__`. 1 and 2 are included by default.
-  - Define how many times the gate needs to be "ticked" by setting it's `__ticksNeeded__` score.
-  - Give the gate a unique `__gateType__` score.
-- Inside `src/flood/id.jmc`:
-  - Inside the gateType switch case in function `zzz_.id_flood.promote`, add a case for your new gate type score.
-  - Create the operation for your new gate
-- Run JMC inside of a terminal.
-- Run `compile` insde of that same terminal.
-  - You can optionally run it with the environment `dbg` (`compile dbg` in the terminal) to get chat messages used for debugging.
-
   
 ## Installation
 ### Datapack
