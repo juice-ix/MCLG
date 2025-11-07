@@ -152,44 +152,6 @@ class place_uielement {
                                             }
                                         }
                                     }
-                                },
-                                {
-                                    "condition": "minecraft:inverted",
-                                    "term": {
-                                        "condition": "minecraft:entity_properties",
-                                        "entity": "this",
-                                        "predicate": {
-                                            "equipment": {
-                                                "mainhand": {
-                                                    "items": "minecraft:stick",
-                                                    "components": {
-                                                        "minecraft:custom_data": {
-                                                            "lg.wrench": true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "condition": "minecraft:inverted",
-                                    "term": {
-                                        "condition": "minecraft:entity_properties",
-                                        "entity": "this",
-                                        "predicate": {
-                                            "equipment": {
-                                                "offhand": {
-                                                    "items": "minecraft:stick",
-                                                    "components": {
-                                                        "minecraft:custom_data": {
-                                                            "lg.wrench": true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             ]
                         }
@@ -228,44 +190,6 @@ class place_uielement {
                                             "type": "minecraft:player",
                                             "input": {
                                                 "sprint": true
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "condition": "minecraft:inverted",
-                                    "term": {
-                                        "condition": "minecraft:entity_properties",
-                                        "entity": "this",
-                                        "predicate": {
-                                            "equipment": {
-                                                "mainhand": {
-                                                    "items": "minecraft:stick",
-                                                    "components": {
-                                                        "minecraft:custom_data": {
-                                                            "lg.wrench": true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "condition": "minecraft:inverted",
-                                    "term": {
-                                        "condition": "minecraft:entity_properties",
-                                        "entity": "this",
-                                        "predicate": {
-                                            "equipment": {
-                                                "offhand": {
-                                                    "items": "minecraft:stick",
-                                                    "components": {
-                                                        "minecraft:custom_data": {
-                                                            "lg.wrench": true
-                                                        }
-                                                    }
-                                                }
                                             }
                                         }
                                     }
@@ -617,7 +541,6 @@ class zzz_.ui.place {
         __wireType__:@s = 0;
 
         if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:end_rod) {
-            scoreboard players set __if_else__ __variable__ 1;
             @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
 
         } else {
@@ -686,8 +609,8 @@ class zzz_.ui.place {
         __gateType__:@s = $type;
         execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.26,limit=2] run {
             __wireType__:@s = 5;
-            __pos0__:@s := __pos0__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
-            __pos2__:@s := __pos2__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
+            __pos0__:@s = __pos0__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
+            __pos2__:@s = __pos2__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
 
             if (entity @s[tag=lg.gate_top]) {
                 __pos1__:@s := __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.5] + 25;
@@ -705,18 +628,24 @@ class zzz_.ui.place {
         }
     }
     @lazy function apply_data.gates.horizontal (wool,type) {
-        summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
-        summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         this.set_gateId();
         $max_gate_id = $max;
         __gateType__:@s = $type;
-        execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.25,limit=2] run {
+        execute as @e[type=block_display,sort=nearest,tag=lg.gate_temp,distance=..0.26,limit=2] run {
+            __wireType__:@s = 5;
+            
+            rotate @s ~ ~;
+
             __pos0__:@s = @s::Pos[0] * 100;
             __pos1__:@s = __pos1__:@n[type=block_display,tag=lg.gate_output,distance=..0.25];
             __pos2__:@s = @s::Pos[2] * 100;
-            rotate @s ~ ~;
+
             __gateId__:@s = $max_gate_id;
             tag @s remove lg.gate_temp;
+
+            execute at @s run zzz_.bfs.backward.get_type();
         }
     }
 
@@ -828,7 +757,7 @@ class zzz_.ui.place {
 
         $id = __playerId__:@s;
         execute at _highlight_ run {
-            if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
+            if (!entity _uiElement_ && !items entity @s weapon.mainhand #c:shulker_boxes && items entity @s weapon.mainhand *) {
                 __cpp__:@s = -1;
                 __crp__:@s = -1;
                 tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
@@ -862,16 +791,14 @@ class zzz_.ui.place {
                         
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:redstone_lamp){
                         this.apply_data.buffer();
-                        zzz_.bfs.backward.get_type();
-                        if (!__wireId2__:@s > 0) {
-                            $max = 0;
-                            execute as @e[type=block_display,tag=lg.hasWireId] run {
-                                $max > __wireId__:@s;
-                                $max > __wireId2__:@s;
-                            }
-                            $max++;
-                            __wireId2__:@s = $max;
+                        $max = 0;
+                        execute as @e[type=block_display,tag=lg.hasWireId] run {
+                            $max > __wireId__:@s;
+                            $max > __wireId2__:@s;
                         }
+                        $max++;
+                        __wireId2__:@s = $max;
+                        zzz_.bfs.backward.get_type();
                         __output__:@s = 0;
 
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:sea_lantern) {
@@ -955,7 +882,7 @@ class zzz_.ui.place {
                     else {tag @s add lg.uiElement;}
                 }
                 tag @s remove lg.placing;
-            } else if (items entity @s weapon.mainhand #minecraft:shulker_boxes[!custom_data~{"lg.chip":1b}]) {
+            } else if (items entity @s weapon.mainhand #c:shulker_boxes[!custom_data~{"lg.chip":1b}]) {
                 __cpp__:@s := (__cpp__:@s + 1) % 3;
                 __crp__:@s = -1;
 
@@ -1031,7 +958,7 @@ class zzz_.ui.place {
                         }
                     }
                 }
-            } else if (items entity @s weapon.mainhand #minecraft:shulker_boxes[custom_data~{"lg.chip":1b}]) {
+            } else if (items entity @s weapon.mainhand #c:shulker_boxes[custom_data~{"lg.chip":1b}]) {
                 $selectedChipId = @s::SelectedItem.components.minecraft:custom_data.id;
                 chip::place.arrs.del();
                 execute run {
@@ -1044,6 +971,7 @@ class zzz_.ui.place {
                 $max_wireId = 0;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId2__:@s;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate,distance=..250] run $max_gateId > __gateId__:@s;
+                $max_wireId++; $max_gateId++;
                     
                 for ($i = chip::place.arrs; $i > 0; $i--) {
                     for ($j = chip::place.arrs[-1]; $j > 0; $j--) {
@@ -1106,7 +1034,7 @@ class zzz_.ui.place {
         Advancement.revoke(@s, only, place_uielement/single);
     }
     function fill() {
-        if (!entity _uiElement_ && !items entity @s weapon.mainhand #minecraft:shulker_boxes && items entity @s weapon.mainhand *) {
+        if (!entity _uiElement_ && !items entity @s weapon.mainhand #c:shulker_boxes && items entity @s weapon.mainhand *) {
 
             __cpp__:@s := (__cpp__:@s + 1) % 3;
             __crp__:@s = -1;

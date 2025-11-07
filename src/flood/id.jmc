@@ -144,10 +144,6 @@ function id_flood () {
                 
                 tag @s remove lg.dirty;
 
-                // Initialize the input scores
-                __bit0__:@s = 0;
-                __bit1__:@s = 0;
-
                 // Initialize the ticks score for finding input bits
                 $ticks = -1;
 
@@ -207,8 +203,10 @@ function id_flood () {
                         // Two input OR gate
                         case 4:
                             debug(["-----------", {color:dark_aqua, text:" OR "}, "-----------"]);
+                            id_flood.get_binary_bits();
                             __output__:@s := (__bit0__:@s + __bit1__:@s) - (__bit0__:@s * __bit1__:@s);
-
+                            $wireId = __wireId2__:@s;
+                            
                         // Two input XNOR gate
                         case 5:
                             debug(["-----------", {color:yellow, text:" XNOR "}, "-----------"]);

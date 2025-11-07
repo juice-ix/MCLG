@@ -324,6 +324,31 @@ class bfs.forward {
     }
 } 
 
+new predicate(matching_wire_id1) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__wireId__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$wireId"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$wireId"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
 Scoreboard.add(__connectedWireId1__); Scoreboard.add(__connectedWireId2__);
 class zzz_.bfs {
 
@@ -443,15 +468,15 @@ class zzz_.bfs {
                 debug("-_-_-_-_-_- Found Output: Gate Input -_-_-_-_-_-");
                 __wireId__:@s = $wireId;
                 $gateId = __gateId__:@s;
-
+                debug ({score:{name:"$wireId",objective:"__variable__"}});
+                debug ({score:{name:"@s",objective:"__wireId__"}});
                 execute as @e[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
                     if ($starter) {tag @s add lg.startsFlood;}
                     if (__connectedWireId1__:@s < 1) {
                         __connectedWireId1__:@s = $wireId;
                     } else if (__connectedWireId2__:@s < 1) {
                         __connectedWireId2__:@s = $wireId;
-                    }
-                       
+                    } 
                 }
                 
                 break;
@@ -564,7 +589,7 @@ class zzz_.bfs {
                         $max > __wireId2__:@s;
                         $max > __wireId__:@s;
                     }
-                    __wireId__:@e[type=block_display,tag=!lg.searched,tag=!lg.gate_output,distance=..250,predicate=mclg:matching_wire_id] = 0;
+                    __wireId__:@e[type=block_display,tag=!lg.searched,tag=!lg.gate_output,distance=..250,predicate=mclg:matching_wire_id1] = 0;
 
                     execute as @e[type=block_display,tag=!lg.searched,distance=..250,predicate=mclg:is_connected] run {
                         if (__connectedWireId1__:@s = $wireId) { __connectedWireId1__:@s = 0;} 

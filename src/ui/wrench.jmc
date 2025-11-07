@@ -1,0 +1,432 @@
+new advancement (wrench.attack_ui) {
+  "criteria": {
+    "hit_interaction": {
+      "trigger": "minecraft:player_hurt_entity",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:any_of",
+            "terms": [
+              {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                  "equipment": {
+                    "offhand": {
+                      "items": "minecraft:stick",
+                      "components": {
+                        "minecraft:custom_data": {
+                          "lg.wrench": true
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                  "equipment": {
+                    "mainhand": {
+                      "items": "minecraft:stick",
+                      "components": {
+                        "minecraft:custom_data": {
+                          "lg.wrench": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "function": "mclg:zzz_/rotate_wires"
+  }
+}
+
+@add(__tick__)
+function zzz_.wrench_display () {
+    execute as @a run 
+    {
+        $id = __playerId__:@s;
+        execute at _highlight_ run {
+            if (items entity @s weapon.* minecraft:stick[minecraft:custom_data~{lg.wrench:1b}]) 
+            {
+                
+
+                    tp @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id] ^0.125 ^0.25 ^-0.25;
+                    if ($description) {
+                        tp @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id] ^0.125 ^-0.125 ^-0.25;
+                    }
+                    tp @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id] ^0.625 ^ ^-0.25;
+                    tp @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id] ^-0.5 ^ ^-0.25;
+                    
+
+                    if (!entity @e[type=text_display,tag=lg.info_display,distance=..2,predicate=mclg:matching_highlight_id,limit=4]) 
+                    {
+                        summon text_display ~ ~ ~ {line_width:500,teleport_duration:1, Tags:["lg.info_display","lg.info_display_temp","lg.info_display_top"],billboard:"center",transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.375f,0.375f,0.375f]},background:16777215};
+                        if ($description) {
+                            summon text_display ~ ~ ~ {line_width:500,teleport_duration:1, Tags:["lg.info_display","lg.info_display_temp","lg.info_display_bottom"],billboard:"center",transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.375f,0.375f,0.375f]},background:16777215};
+                        }
+                        summon text_display ~ ~ ~ {line_width:500,teleport_duration:1, Tags:["lg.info_display","lg.info_display_temp","lg.info_display_left"],billboard:"center",transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.375f,0.375f,0.375f]},background:16777215};
+                        summon text_display ~ ~ ~ {line_width:500,teleport_duration:1, Tags:["lg.info_display","lg.info_display_temp","lg.info_display_right"],billboard:"center",transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.375f,0.375f,0.375f]},background:16777215};
+                
+                        execute as @e[type=text_display,tag=lg.info_display_temp,distance=..2,limit=4] run 
+                        {
+                            __playerId__:@s = $id;
+                            tag @s remove lg.info_display_temp;
+                            rotate @s ~180 ~;
+                        }
+                    }
+                    
+                    if (entity _uiElement_) 
+                    {
+                        execute as _uiElement_ run
+                        {
+                            switch (__wireType__:@s) 
+                            {
+                                case 0:
+
+                                    if (entity @s[tag=lg.rod])
+                                    {
+                                        @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nRod";
+
+                                        switch(__rodRotation__:@s)
+                                        {
+                                            case 0:
+                                                @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Direction: \nNorth to South";
+                                            case 1:
+                                                @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Direction: \nEast to West";
+                                            case 2:
+                                                @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Direction: \nSouth to North";
+                                            case 3:
+                                                @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Direction: \nWest to East";
+                                        }
+                                        
+                                        @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                        if ($description) {
+                                            @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Carries an input in a single direction";
+                                        }
+                                    } break;
+                                    else 
+                                    {
+                                        @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                        @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                        @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                        @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    }
+                                    
+                                case 1:
+                                    @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nStair";
+                                    
+                                    switch (__stairRotation__:@s) 
+                                    {
+                                        case 0:
+                                            @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Inputs: \nNorth, West";
+                                        case 1:
+                                            @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Inputs: \nNorth, East";
+                                        case 2:
+                                            @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Inputs: \nSouth, West";
+                                        case 3:
+                                            @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "Inputs: \nSouth, East";
+                                    }
+
+                                    @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "\nChanges the direction an input is traveling in";
+                                
+                                case 2:
+                                    @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nBulb";
+                                    @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    if ($description) {
+                                        @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Allows wires to cross perpendicularly";
+                                    }
+                                case 3:
+                                    @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nGrate";
+                                    @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = "";
+                                    if ($description) {
+                                        @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Splits a wire into multiple directions";
+                                    }
+                                case 4:
+                                    if (entity @s[tag=lg.buffer]) 
+                                    {
+                                        if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId__:@s;}
+                                        $out_wire_id = __wireId2__:@s;
+                                        @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nBuffer";
+                                        @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Output Wire ID: \n", {score:{name:"$out_wire_id",objective:"__variable__"}}];
+                                        @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Input Wire ID: \n", {score:{name:"$display_wire_id",objective:"__variable__"}}]; 
+                                        if ($description) {
+                                            @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Holds a bit";
+                                        }
+                                    } break;
+                                    else 
+                                    {
+                                        if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId__:@s;}
+                                        if ($display_cwid1 != __connectedWireId1__:@s) {$display_cwid1 = __connectedWireId1__:@s;}
+                                        if ($display_cwid2 != __connectedWireId2__:@s) {$display_cwid2 = __connectedWireId2__:@s;}
+                                        
+                                        switch (__gateType__:@s)
+                                        {
+                                            case 0:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nAND Gate Output";
+                                            case 1:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nNAND Gate Output";
+                                            case 2:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nNOR Gate Output";
+                                            case 3:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nNOT Gate Output";
+                                            case 4:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nOR Gate Output";
+                                            case 5:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nXNOR Gate Output";
+                                            case 6:
+                                                @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nXOR Gate Output";
+                                        }
+                                        
+                                        @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Output Wire ID: \n", {score:{name:"$display_wire_id",objective:"__variable__"}}];
+                                        @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Input Wire IDs: \n", {score:{name:"$display_cwid1",objective:"__variable__"}}, ", ", {score:{name:"$display_cwid2",objective:"__variable__"}}];
+                                        if ($description) {
+                                            @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Performs an operation on two bits from two inputs, then outputs the result";
+                                        }
+                                    }
+                                case 5:
+                                        if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId__:@s;} break;
+                                        if ($display_gate_id != __gateId__:@s) {$display_gate_id = __gateId__:@s;}
+                                        @n[type=text_display,tag=lg.info_display_top,distance=..2,predicate=mclg:matching_highlight_id]::text = "Highlighted Element: \nGate Input";
+                                        @n[type=text_display,tag=lg.info_display_left,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Gate ID: \n", {score:{name:"$display_gate_id",objective:"__variable__"}}];
+                                        @n[type=text_display,tag=lg.info_display_right,distance=..2,predicate=mclg:matching_highlight_id]::text = ["Linked Wire ID: \n", {score:{name:"$display_wire_id",objective:"__variable__"}}];      
+                                        @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "";                          
+                                break;
+                            }
+                        }
+                        
+                    } else 
+                    {
+                        execute as @e[type=text_display,tag=lg.info_display,distance=..2,predicate=mclg:matching_highlight_id] run @s::text = "";
+                    }
+                
+                
+            } 
+            else if (entity @e[type=text_display,tag=lg.info_display,distance=..2,predicate=mclg:matching_highlight_id,limit=4]) 
+            {
+                kill @e[type=text_display,tag=lg.info_display,distance=..2,predicate=mclg:matching_highlight_id,limit=4];
+            }
+        }
+    }
+}
+
+@add(__tick__)
+function zzz_.rotation_display () {
+    execute as @a run 
+    {
+        if (items entity @s weapon.* #mclg:wires/rods) {
+            switch (__rodRotation__:@s) {
+                case 0:
+                    title @s actionbar "Direction: North to South";
+                case 1:
+                    title @s actionbar "Direction: East to West";
+                case 2:
+                    title @s actionbar "Direction: South to North";
+                case 3:
+                    title @s actionbar "Direction: West to East";
+            }
+        } else if (items entity @s weapon.* #mclg:wires/stairs) {
+            switch (__stairRotation__:@s) {
+                case 0:
+                    title @s actionbar "Inputs: North, West";
+                case 1:
+                    title @s actionbar "Inputs: North, East";
+                case 2:
+                    title @s actionbar "Inputs: South, West";
+                case 3:
+                    title @s actionbar "Inputs: South, East";
+            }
+        } else if (items entity @s weapon.* minecraft:sea_lantern) {
+
+            if (__gateOrientation__:@s = 0) {
+                switch (__gateType__:@s) {
+                    case 0:
+                        title @s actionbar "[Vertical] Gate Type: AND";
+                    case 1:
+                        title @s actionbar "[Vertical] Gate Type: NAND";
+                    case 2:
+                        title @s actionbar "[Vertical] Gate Type: NOR";
+                    case 3:
+                        title @s actionbar "[Vertical] Gate Type: NOT";
+                    case 4:
+                        title @s actionbar "[Vertical] Gate Type: OR";
+                    case 5:
+                        title @s actionbar "[Vertical] Gate Type: XNOR";
+                    case 6:
+                        title @s actionbar "[Vertical] Gate Type: XOR";
+                }
+            } else {
+                switch (__gateType__:@s) {
+                    case 0:
+                        title @s actionbar "[Horizontal] Gate Type: AND";
+                    case 1:
+                        title @s actionbar "[Horizontal] Gate Type: NAND";
+                    case 2:
+                        title @s actionbar "[Horizontal] Gate Type: NOR";
+                    case 3:
+                        title @s actionbar "[Horizontal] Gate Type: NOT";
+                    case 4:
+                        title @s actionbar "[Horizontal] Gate Type: OR";
+                    case 5:
+                        title @s actionbar "[Horizontal] Gate Type: XNOR";
+                    case 6:
+                        title @s actionbar "[Horizontal] Gate Type: XOR";
+                }
+            }
+            
+        }
+    }
+    
+}
+
+@lazy function rotate_rods (rodRotation) {
+    @s::Tags = ui::element_info.rod.$rodRotation.tags;
+    @s::CustomName = ui::element_info.rod.$rodRotation.display;
+
+    if (data entity @s block_state{Name:"minecraft:end_rod"}) {
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
+    } else {
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.lightning_rod_facing;
+    }
+}
+
+@lazy function rotate_stairs (stairRotation) {
+    @s::Tags = ui::element_info.stair.$stairRotation.tags;
+    @s::CustomName = ui::element_info.stair.$stairRotation.display;
+    @s::block_state.Properties.half = ui::element_info.stair.$stairRotation.half;
+    @s::block_state.Properties.facing = ui::element_info.stair.$stairRotation.facing;
+}
+
+function zzz_.rotate_wires () {
+    Advancement.revoke(@s,only,wrench/attack_ui);
+
+    $id = __playerId__:@s;
+    execute at _highlight_ run 
+    {
+        if (items entity @s weapon.* #mclg:wires/rods) {
+            __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
+
+        } else if (items entity @s weapon.* #mclg:wires/stairs) {
+            __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
+
+        } else if (items entity @s weapon.* minecraft:sea_lantern) {
+
+            if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b}}}}) {
+                __gateOrientation__:@s := (__gateOrientation__:@s + 1) % 2;
+            } else {
+                __gateType__:@s := (__gateType__:@s + 1) % 7;
+            }
+
+        } else if (entity _uiElement_) {
+
+            execute as _uiElement_ run {
+
+                if (entity @s[tag=lg.rod]) {
+
+                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                    tag @s add lg.removing;
+                    zzz_.bfs.backward.get_type();
+
+                    __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
+                    
+                    switch (__rodRotation__:@s) {
+                        case 0:
+                            rotate_rods(0);
+                        case 1:
+                            rotate_rods(1);
+                        case 2:
+                            rotate_rods(2);
+                        case 3:
+                            rotate_rods(3);
+                    }
+
+                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                    tag @s remove lg.removing;
+                    zzz_.bfs.backward.get_type(); 
+
+                } else if (entity @s[tag=lg.stair]) {
+
+                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                    tag @s add lg.removing;
+                    zzz_.bfs.backward.get_type();
+
+                    __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
+
+                    switch (__stairRotation__:@s) {
+                        case 0:
+                            rotate_stairs(0);
+                        case 1:
+                            rotate_stairs(1);
+                        case 2:
+                            rotate_stairs(2);
+                        case 3:
+                            rotate_stairs(3);
+                    }
+
+                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                    tag @s remove lg.removing;
+                    zzz_.bfs.backward.get_type(); 
+                }
+            }
+        }
+    }
+}
+
+function give_wrench () {
+    give @s minecraft:stick[custom_data={lg.wrench:1b},item_name="Wrench"];
+}
+
+function toggle_starter () {
+    $id = __playerId__:@s;
+    execute at _highlight_ as @n[type=block_display,tag=lg.buffer,distance=..0.001] run {
+
+        $state = @s::block_state.Properties.lit;
+        $wireId = __wireId2__:@s;
+
+        if (entity @s[tag=lg.starter]) {
+            tag @s remove lg.starter;
+            tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] remove lg.startsFlood;
+            tellraw @a "Removed starter tag";
+        }
+        else {
+            tag @s add lg.starter;
+            tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] add lg.startsFlood;
+            tellraw @a "Added starter tag";
+        }
+    }
+}
+
+function toggle_bit () {
+    $id = __playerId__:@s;
+    execute at _highlight_ run {
+        execute as @n[tag=lg.buffer,distance=..0.001] run {
+            $state = @s::block_state.Properties.lit;
+            if ($state = 4) {
+                data modify entity @s block_state.Properties.lit set value "false";
+                __output__:@s = 0;
+                if (__bitmask__:@s > 0) {__packs__:$pack_0 -= __bitmask__:@s;}
+            }
+            if ($state = 5) {
+                data modify entity @s block_state.Properties.lit set value "true";
+                __output__:@s = 1;
+                if (__bitmask__:@s) {__packs__:$pack_0 += __bitmask__:@s;}
+            }
+        }
+    }
+}
+
+function set_chip_name () {
+    $item modify entity @s weapon.mainhand {function:"minecraft:set_name",name:{text:"$(name)"},target:"item_name",conditions:[]};
+}

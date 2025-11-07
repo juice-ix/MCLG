@@ -23,8 +23,7 @@ import "ui/modify/remove";
 import "ui/modify/rotate";
 import "ui/raycast";
 import "ui/spawn";
-import "ui/utils";
-
+import "ui/wrench";
 import "flood/compiled";
 import "flood/id";
 import "flood/wire";
@@ -36,3 +35,4 @@ $uiSize ??= 500;
 $chipId ??= -2147483600;
 $maxChipBlocksPerTick = 100;
 $idFloodCycleLimit ??= 10000;
+$description ??= true;
