@@ -264,14 +264,14 @@ class zzz_.ui.remove {
             __rp1__:@s = ui::removePos[1] * 100;
             __rp2__:@s = ui::removePos[2] * 100;
 
-            tellraw @s "Set Point 1";
+            tellraw @s "Set Remove Point 1";
         } else if (__crp__:@s = 1) {
             ui::removePos = _highlight_::Pos;
             __rp3__:@s = ui::removePos[0] * 100;
             __rp4__:@s = ui::removePos[1] * 100;
             __rp5__:@s = ui::removePos[2] * 100;
 
-            tellraw @s "Set Point 2. Left click to confirm.";
+            tellraw @s "Set Remove Point 2. While sprinting: \nLeft click with no items in your offhand to remove all elements within the selected area. \nLeft click with an item in your offhand, but no item in your mainhand to remove all of that specific element within the selected area. \nLeft click with items in both your main and offhand to replace elements as the block in your offhand with elements as the block in your mainhand.";
         } else {
 
             if (__rp0__:@s > __rp3__:@s) {__rp0__:@s >< __rp3__:@s;}

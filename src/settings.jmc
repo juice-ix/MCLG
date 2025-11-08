@@ -1,0 +1,154 @@
+new dialog (settings) {
+  "type": "minecraft:multi_action",
+  "title": "MCLG Settings",
+  "inputs": [],
+  "after_action": "close",
+  "actions": [
+    {
+      "label": "UI Settings",
+      "action": {
+        "type": "minecraft:run_command",
+        "command": "function mclg:jmcignore/settings/show_ui with storage mclg:settings ui"
+      }
+    },
+    {
+      "label": "Runtime Settings",
+      "action": {
+        "type": "minecraft:run_command",
+        "command": "function mclg:jmcignore/settings/show_runtime with storage mclg:settings runtime"
+      }
+    }
+  ]
+}
+
+new tags.dialog (minecraft.pause_screen_additions) {
+    "values" : ["mclg:settings"]
+}
+function zzz_.settings.save_ui () {
+
+    $respawnUi = false;
+    $execute unless score $uiSize __variable__ matches $(uiSize) run $respawnUi = true;
+
+    $scoreboard players set $uiSize __variable__ $(uiSize);
+    $scoreboard players set $description __variable__ $(showDescription);
+
+    if ($respawnUi) {spawn_ui();}
+    
+    settings::ui.size = $uiSize;
+    settings::ui.showDescription = $description;
+
+    dialog show @s mclg:settings;
+}
+
+function zzz_.settings.save_runtime () {
+
+    $scoreboard players set $idFloodCycleLimit __variable__ $(ifcl);
+    $scoreboard players set $storageFloodCycleLimit __variable__ $(sfcl);   
+    $scoreboard players set $continuousIdFlood __variable__ $(cif);
+    $scoreboard players set $continuousStorageFlood __variable__ $(csf);
+
+    if ($continuousIdFlood = 1 && $continuousStorageFlood = 1) {
+        $continuousIdFlood = 0;
+        $continuousStorageFlood = 0;
+    }
+
+    settings::runtime.idFloodCycleLimit = $idFloodCycleLimit;
+    settings::runtime.storageFloodCycleLimit = $storageFloodCycleLimit;
+    settings::runtime.continuousIdFlood = $continuousIdFlood;
+    settings::runtime.continuousStorageFlood = $continuousStorageFlood;
+
+    dialog show @s mclg:settings;
+}
+
+// function jmcignore.settings.show_ui () {
+//     $dialog show @s {
+//         "type": "minecraft:confirmation",
+//         "title": "UI Settings",
+//         "inputs": [
+//             {
+//             "type": "minecraft:number_range",
+//             "key": "uiSize",
+//             "label": "UI Size",
+//             "start": 50,
+//             "end": 1000,
+//             "step": 50,
+//             "initial": $(size)
+//             },
+//             {
+//             "type": "minecraft:boolean",
+//             "key": "showDescription",
+//             "label": "Show Hovered Element Descriptions",
+//             "initial": $(showDescription)
+//             }
+//         ],
+//         "after_action": "close",
+//         "yes": {
+//             "label": "Save",
+//             "action": {
+//             "type": "minecraft:dynamic/run_command",
+//             "template": "function mclg:zzz_/settings/save_ui {uiSize: \u0024(uiSize), showDescription: \u0024(showDescription)}"
+//             }
+//         },
+//         "no": {
+//             "label": "Exit",
+//             "action": {
+//             "type": "minecraft:show_dialog",
+//             "dialog": "mclg:settings"
+//             }
+//         }
+//     };
+// }
+
+// function jmcignore.settings.show_runtime () {
+//     dialog show @s {
+//         "type": "minecraft:confirmation",
+//         "title": "Runtime Settings",
+//         "inputs": [
+//             {
+//             "type": "minecraft:number_range",
+//             "key": "ifcl",
+//             "label": "ID Flood Cycle Limit",
+//             "start": 1,
+//             "end": 10000,
+//             "step": 1,
+//             "initial": $(idFloodCycleLimit)
+//             },
+//             {
+//             "type": "minecraft:number_range",
+//             "key": "sfcl",
+//             "label": "Storage Flood Cycle Limit",
+//             "start": 1,
+//             "end": 10000,
+//             "step": 1,
+//             "initial": $(storageFloodCycleLimit)
+//             },
+//             {
+//             "type": "minecraft:boolean",
+//             "key": "cif",
+//             "label": "Continuous ID Flood",
+//             "initial": $(continuousIdFlood)
+//             },
+//             {
+//             "type": "minecraft:boolean",
+//             "key": "csf",
+//             "label": "Continuous Storage Flood",
+//             "initial": $(continuousStorageFlood)
+//             }
+//         ],
+//         "after_action": "close",
+//         "yes": {
+//             "label": "Save",
+//             "action": {
+//             "type": "minecraft:dynamic/run_command",
+//             "template": "function mclg:zzz_/settings/save_runtime {ifcl: $(ifcl), sfcl: $(sfcl), cif: $(cif), csf: $(csf)}"
+//             }
+//         },
+//         "no": {
+//             "label": "Exit",
+//             "action": {
+//             "type": "minecraft:show_dialog",
+//             "dialog": "mclg:settings"
+//             }
+//         }
+//         };
+// }

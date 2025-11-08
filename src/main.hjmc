@@ -11,3 +11,7 @@
 
 #define intLimit 2147483647
 #env dbg
+
+#command dialog
+#override minecraft
+#static "function/jmcignore"

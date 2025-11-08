@@ -3,6 +3,7 @@ Scoreboard.add(__playerId__);
 @if(dbg) function debug(text) {
     tellraw @a $text;
 }
+gamerule maxCommandChainLength 1000000;
 function  __tick__  () {
     execute as @a unless score @s __playerId__ matches 1.. run {
         __gateOrientation__:@s ??= 0;
@@ -16,6 +17,10 @@ function  __tick__  () {
     if ($uiCheck > 0) {
         $uiSize := 50 - $uiCheck + $uiSize;
     }
+
+    if ($continuousIdFlood) {
+        id_flood();
+    }
 }
 
 import "ui/modify/place";
@@ -27,12 +32,24 @@ import "ui/wrench";
 import "flood/compiled";
 import "flood/id";
 import "flood/wire";
+import "settings";
 
 //import "items";
 
 
+$continuousIdFlood ??= 0;
+$continuousStorageFlood ??= 0;
+$idFloodCycleLimit ??= 1000;
+$storageFloodCycleLimit ??= 10000;
+
 $uiSize ??= 500;
-$chipId ??= -2147483600;
-$maxChipBlocksPerTick = 100;
-$idFloodCycleLimit ??= 10000;
 $description ??= true;
+
+$chipId ??= -2147483600;
+
+settings::ui.size = $uiSize;
+settings::ui.showDescription = $description;
+settings::runtime.idFloodCycleLimit = $idFloodCycleLimit;
+settings::runtime.storageFloodCycleLimit = $storageFloodCycleLimit;
+settings::runtime.continuousIdFlood = $continuousIdFlood;
+settings::runtime.continuousStorageFlood = $continuousStorageFlood;

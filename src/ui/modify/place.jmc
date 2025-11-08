@@ -930,14 +930,11 @@ class zzz_.ui.place {
                     $min_wireId = intLimit;
                     $chipId++;
                     $yaw = _highlight_::Rotation[0];
-                    execute as @e[type=block_display,tag=lg.uiElement,distance=..250,tag=lg.gate] run {
-                        $min_gateId < __gateId__:@s;
-                    }
-                    execute as @e[type=block_display,tag=lg.uiElement,tag=!lg.gate_input,distance=..250,tag=lg.hasWireId] run {
-                        $min_wireId < __wireId2__:@s;
-                    }
-                    $min_gateId--;
+                    $min_gateId < __gateId__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250];
+                    $min_wireId < __wireId__:@e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.gate_input,distance=..250];
+                    
                     $min_wireId--;
+
                     debug({score:{name:"$min_wireId",objective:"__variable__"}});
                     debug({score:{name:"$min_gateId",objective:"__variable__"}});
                     $recur = execute if entity @e[type=block_display,tag=lg.uiElement,distance=..250,predicate=mclg:between_points];
@@ -977,7 +974,7 @@ class zzz_.ui.place {
                 $max_wireId = 0;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId2__:@s;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate,distance=..250] run $max_gateId > __gateId__:@s;
-                $max_wireId++; $max_gateId++;
+                $max_gateId++;
                     
                 for ($i = chip::place.arrs; $i > 0; $i--) {
                     for ($j = chip::place.arrs[-1]; $j > 0; $j--) {
@@ -1002,7 +999,11 @@ class zzz_.ui.place {
                                     __connectedWireId2__:@s := {chip::place.arrs[-1][-1].rel_id.connectedWire.2} + $max_wireId;
                                 }
                             } else if (entity @s[tag=lg.buffer]) {
-                                __connectedWireId1__:@s := {chip::place.arrs[-1][-1].rel_id.connectedWire.1} + $max_wireId;
+                                $currcwid1 = chip::place.arrs[-1][-1].rel_id.connectedWire.1;
+                                if ($currcwid1 > 0) {
+                                    __connectedWireId1__:@s := $currcwid1 + $max_wireId;
+                                }
+                                
                             }
                             if (entity @s[tag=lg.permaStarter,tag=lg.buffer]) {tag @s add lg.starter;}
                             execute run {
@@ -1024,7 +1025,13 @@ class zzz_.ui.place {
                             tag @s remove lg.chip_placing;
                             
                             if (entity @s[tag=lg.hasWireId]) {
-                                __wireId__:@s := {chip::place.arrs[-1][-1].rel_id.wire.1} + $max_wireId;
+                                $currwid = chip::place.arrs[-1][-1].rel_id.wire.1;
+                                if ($currwid = 0) {
+                                    __wireId__:@s = 0;
+                                } else {
+                                    __wireId__:@s := $currwid + $max_wireId;
+                                }
+                                
                                 __wireId2__:@s := {chip::place.arrs[-1][-1].rel_id.wire.2} + $max_wireId;
                                 
                             }
@@ -1051,14 +1058,14 @@ class zzz_.ui.place {
                 __pp1__:@s = ui::placePos[1] * 100;
                 __pp2__:@s = ui::placePos[2] * 100;
 
-                tellraw @s "Set Point 1";
+                tellraw @s "Set Place Point 1";
             } else if (__cpp__:@s = 1) {
                 ui::placePos = _highlight_::Pos;
                 __pp3__:@s = ui::placePos[0] * 100;
                 __pp4__:@s = ui::placePos[1] * 100;
                 __pp5__:@s = ui::placePos[2] * 100;
 
-                tellraw @s "Set Point 2. Right click to confirm.";
+                tellraw @s "Set Place Point 2. Right click to confirm.";
             } else {
 
                 if (__pp0__:@s > __pp3__:@s) {__pp0__:@s >< __pp3__:@s;}

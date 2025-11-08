@@ -466,19 +466,29 @@ class zzz_.bfs {
                 break;
             case 5:
                 debug("-_-_-_-_-_- Found Output: Gate Input -_-_-_-_-_-");
-                __wireId__:@s = $wireId;
                 $gateId = __gateId__:@s;
-                debug ({score:{name:"$wireId",objective:"__variable__"}});
-                debug ({score:{name:"@s",objective:"__wireId__"}});
-                execute as @e[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
-                    if ($starter) {tag @s add lg.startsFlood;}
-                    if (__connectedWireId1__:@s < 1) {
-                        __connectedWireId1__:@s = $wireId;
-                    } else if (__connectedWireId2__:@s < 1) {
-                        __connectedWireId2__:@s = $wireId;
-                    } 
-                }
+                __wireId__:@s = $wireId;
                 
+                debug ({score:{name:"$wire_id",objective:"__variable__"}});
+
+                execute as @n[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
+                    __connectedWireId1__:@s = 0;
+                    __connectedWireId2__:@s = 0;
+                }
+
+                execute as @e[type=block_display,tag=lg.gate_input,distance=..250,predicate=mclg:matching_gate_id] run {
+
+                    $wire_id = __wireId__:@s;
+
+                     execute as @n[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
+                        if ($starter) {tag @s add lg.startsFlood;}
+                        if (__connectedWireId1__:@s = 0) {
+                            __connectedWireId1__:@s = $wire_id;
+                        } else if (__connectedWireId2__:@s = 0) {
+                            __connectedWireId2__:@s = $wire_id;
+                        }
+                    }
+                }
                 break;
         }
                 

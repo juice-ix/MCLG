@@ -335,14 +335,14 @@ function zzz_.rotate_wires () {
                 __rop1__:@s = ui::rotatePos[1] * 100;
                 __rop2__:@s = ui::rotatePos[2] * 100;
 
-                tellraw @s "Set Point 1";
+                tellraw @s "Set Rotate Point 1";
             } else if (__crop__:@s = 1) {
                 ui::rotatePos = _highlight_::Pos;
                 __rop3__:@s = ui::rotatePos[0] * 100;
                 __rop4__:@s = ui::rotatePos[1] * 100;
                 __rop5__:@s = ui::rotatePos[2] * 100;
 
-                tellraw @s "Set Point 2. Left click to confirm.";
+                tellraw @s "Set Rotate Point 2. Left click to confirm.";
             } else {
 
                 if (__rop0__:@s > __rop3__:@s) {__rop0__:@s >< __rop3__:@s;}
@@ -394,82 +394,177 @@ function zzz_.rotate_wires () {
                 }
 
                 tag @s add lg.rotating;
-                execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points] run {
+                if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{forward:0b,left:0b}}}}) {
+                    execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points] run {
 
-                    ui::rotatePos = @s::Pos;
+                        ui::rotatePos = @s::Pos;
 
-                    $xpos := $centerX + (__pos1__:@s - $centerY);
-                    
-                    if ($useAxis = 0) {
-                        $ypos := $centerY - (__pos0__:@s - $centerX);
+                        $xpos := $centerX + (__pos1__:@s - $centerY);
+                        
+                        if ($useAxis = 0) {
+                            $ypos := $centerY - (__pos0__:@s - $centerX);
 
-                        ui::rotatePos[0] = 100 * ui::rotatePos[0];
-                        ui::rotatePos[0] = $xpos;
-                        ui::rotatePos[1] = $ypos;
-                        __pos0__:@s = $xpos;
-                        __pos1__:@s = $ypos;
+                            ui::rotatePos[0] = 100 * ui::rotatePos[0];
+                            ui::rotatePos[0] = $xpos;
+                            ui::rotatePos[1] = $ypos;
+                            __pos0__:@s = $xpos;
+                            __pos1__:@s = $ypos;
 
-                        @s::Pos[0] = 0.01 * (double) ui::rotatePos[0];
-                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+                            @s::Pos[0] = 0.01 * (double) ui::rotatePos[0];
+                            @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
 
-                    } else if ($useAxis = 2) {
-                        $ypos := $centerY - (__pos2__:@s - $centerX);
+                        } else if ($useAxis = 2) {
+                            $ypos := $centerY - (__pos2__:@s - $centerX);
 
-                        ui::rotatePos[2] = 100 * ui::rotatePos[2];
-                        ui::rotatePos[2] = $xpos;
-                        ui::rotatePos[1] = $ypos;
-                        __pos2__:@s = $xpos;
-                        __pos1__:@s = $ypos;
+                            ui::rotatePos[2] = 100 * ui::rotatePos[2];
+                            ui::rotatePos[2] = $xpos;
+                            ui::rotatePos[1] = $ypos;
+                            __pos2__:@s = $xpos;
+                            __pos1__:@s = $ypos;
 
-                        @s::Pos[2] = 0.01 * (double) ui::rotatePos[2];
-                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+                            @s::Pos[2] = 0.01 * (double) ui::rotatePos[2];
+                            @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
 
-                    } else if ($useAxis = 3) {
-                        say "hi";
-                        if ($yaw = 0 || $yaw = 180)
-                        {$ypos := $centerY - (__pos0__:@s - $centerX);} else
-                        {$ypos := $centerY - (__pos2__:@s - $centerX);}
+                        } else if ($useAxis = 3) {
+                            if ($yaw = 0 || $yaw = 180)
+                            {
+                                $ypos := $centerY - (__pos0__:@s - $centerX);
+                                ui::rotatePos[0] = $xpos;
+                                __pos0__:@s = $xpos;
 
-                        ui::rotatePos[1] = $ypos;
-                        __pos1__:@s = $ypos;
+                                @s::Pos[0] = 0.01 * (double) ui::rotatePos[0];
+                            } else
+                            {
+                                $ypos := $centerY - (__pos2__:@s - $centerX);
+                                ui::rotatePos[2] = $xpos;
+                                __pos2__:@s = $xpos;
+                                
+                                @s::Pos[2] = 0.01 * (double) ui::rotatePos[2];
+                            }
 
-                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
-                    }
+                            ui::rotatePos[1] = $ypos;
+                            __pos1__:@s = $ypos;
 
-                    if (entity @s[tag=lg.stair]) {
-                        switch (__stairRotation__:@s) {
-                            case 0:
-                                rotate_stairs(2);
-                                __stairRotation__:@s = 2;
-                            case 1:
-                                rotate_stairs(0);
-                                __stairRotation__:@s = 0;
-                            case 2:
-                                rotate_stairs(3);
-                                __stairRotation__:@s = 3;
-                            case 3:
-                                rotate_stairs(1);
-                                __stairRotation__:@s = 1;                                
+                            @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
                         }
-                    } else if (entity @s[tag=lg.rod]) {
-                        __rodRotation__:@s := (__rodRotation__:@s - 1) % 4;
-                        switch (__rodRotation__:@s) {
-                            case 0:
-                                rotate_rods(0);
-                            case 1:
-                                rotate_rods(1);
-                            case 2:
+
+                        if (entity @s[tag=lg.stair]) {
+                            switch (__stairRotation__:@s) {
+                                case 0:
+                                    rotate_stairs(2);
+                                    __stairRotation__:@s = 2;
+                                case 1:
+                                    rotate_stairs(0);
+                                    __stairRotation__:@s = 0;
+                                case 2:
+                                    rotate_stairs(3);
+                                    __stairRotation__:@s = 3;
+                                case 3:
+                                    rotate_stairs(1);
+                                    __stairRotation__:@s = 1;                                
+                            }
+                        } else if (entity @s[tag=lg.rod]) {
+                            switch (__rodRotation__:@s) {
+                                case 0:
+                                    rotate_rods(3);
+                                    __rodRotation__:@s = 3;
+                                case 1:
+                                    rotate_rods(0);
+                                    __rodRotation__:@s = 0;
+                                case 2:
+                                    rotate_rods(1);
+                                    __rodRotation__:@s = 1;
+                                case 3:
+                                    rotate_rods(2);
+                                    __rodRotation__:@s = 2;
+                            }
+                        }
+                    }
+                    tellraw @s "Rotated 90 degrees counterclockwise";
+                } else if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{forward:1b}}}}) {
+                    execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points] run {
+                        
+                        $ypos := 2 * $centerY - __pos1__:@s ;
+
+                        ui::rotatePos[1] = $ypos;
+                        __pos1__:@s = $ypos;
+
+                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+
+                        if (entity @s[tag=lg.stair]) {
+                            switch (__stairRotation__:@s) {
+                                case 0:
+                                    rotate_stairs(2);
+                                    __stairRotation__:@s = 2;
+                                case 1:
+                                    rotate_stairs(3);
+                                    __stairRotation__:@s = 3;
+                                case 2:
+                                    rotate_stairs(0);
+                                    __stairRotation__:@s = 0;
+                                case 3:
+                                    rotate_stairs(1);
+                                    __stairRotation__:@s = 1;                                
+                            }
+                        } else if (entity @s[tag=lg.rod]) {
+                            if (__rodRotation__:@s = 0) {
                                 rotate_rods(2);
-                            case 3:
-                                rotate_rods(3);
+                                __rodRotation__:@s = 2;
+                            } else if (__rodRotation__:@s = 2) {
+                                rotate_rods(0);
+                                __rodRotation__:@s = 0;
+                            }
                         }
                     }
+                    tellraw @s "Mirroed about the center on the X axis";
+                } else if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{left:1b}}}}) {
+                    execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points] run {
+                        if ($useAxis = 0) {
+                            $xpos := 2 * $centerX - __pos0__:@s;
+                            __pos0__:@s = $xpos;
+                            ui::rotatePos[0] = $xpos;
+
+                            @s::Pos[0] = 0.01 * (double) ui::rotatePos[0];
+                        } else if ($useAxis = 2) {
+                            $xpos := 2 * $centerX - __pos2__:@s;
+                            __pos2__:@s = $xpos;
+                            ui::rotatePos[2] = $xpos;
+
+                            @s::Pos[2] = 0.01 * (double) ui::rotatePos[2];
+                        }
+
+                        if (entity @s[tag=lg.stair]) {
+                                switch (__stairRotation__:@s) {
+                                    case 0:
+                                        rotate_stairs(1);
+                                        __stairRotation__:@s = 1;
+                                    case 1:
+                                        rotate_stairs(0);
+                                        __stairRotation__:@s = 0;
+                                    case 2:
+                                        rotate_stairs(3);
+                                        __stairRotation__:@s = 3;
+                                    case 3:
+                                        rotate_stairs(2);
+                                        __stairRotation__:@s = 2;                                
+                                }
+                        } else if (entity @s[tag=lg.rod]) {
+                            if (__rodRotation__:@s = 1) {
+                                rotate_rods(3);
+                                __rodRotation__:@s = 3;
+                            } else if (__rodRotation__:@s = 3) {
+                                rotate_rods(1);
+                                __rodRotation__:@s = 1;
+                            }
+                        }
+                    }
+                    tellraw @s "Mirroed about the center on the Y axis";
                 }
                 tag @s remove lg.rotating;
             }
 
         } else {
-
+            __crop__:@s = -1;
             if (items entity @s weapon.* #mclg:wires/rods) {
                 __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
 
@@ -540,8 +635,18 @@ function zzz_.rotate_wires () {
     }
 }
 
+Item.create(
+    wrench,
+    minecraft:stick,
+    component = [
+        custom_data = {lg.wrench:1b},
+        item_name = "Wrench",
+        lore=[{"color":"white","italic":false,"text":"Hover over elements to see additional information."},{"color":"green","italic":false,"text":"While not sneaking:"},{"color":"white","italic":false,"text":"Left click elements to rotate them."},{"color":"white","italic":false,"text":"(While wrench in offhand) Left click with a rod / stair in your hand to change rotation before placing."},{"color":"white","italic":false,"text":"(While wrench in offhand) Left click with a sea lantern in your hand to change gate type. Sprint left click to change gate orientation."},{"color":"green","italic":false,"text":"While sneaking:"},[{"color":"white","italic":false,"text":"Left click to select an area. "},{"color":"blue","text":"While an area is selected:"}],{"color":"white","italic":false,"text":"Left click to rotate 90 degrees counterclockwise. about the center"},{"color":"white","italic":false,"text":"W + Left Click to mirror across the X axis."},{"color":"white","italic":false,"text":"A + Left Click to mirror across the Y axis."}]
+    ]
+);
+
 function give_wrench () {
-    give @s minecraft:stick[custom_data={lg.wrench:1b},item_name="Wrench"];
+    Item.give(wrench);
 }
 
 function toggle_starter () {
