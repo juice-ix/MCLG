@@ -1,6 +1,8 @@
 # Minecraft Logic Gates
 Build 2D Logic Gate systems!
 
+Features with a strikethrough are planned but not yet fully implemented.
+
 ## Starting Out
 To start creating logic gate systems, first run `/function mclg:spawn_ui` in chat. 
 
@@ -53,7 +55,11 @@ There are a number of settings accessible within the pause menu.
 
 ## Installation
 ### Datapack
+<<<<<<< HEAD
 Navigate to releases and download the datapack.zip file you want. Then open your minecraft saves folder, find your world, open the datapacks folder, and copy paste the downloaded datapack.zip file.
+=======
+First, install [Bookshelf View](https://modrinth.com/datapack/bookshelf-view/version/3.1.1). Then, navigate to releases and download the datapack.zip file you want. Lastly, open your minecraft saves folder, find your world, open the datapacks folder, and copy paste both datapacks inside.
+>>>>>>> 42ce3c1 (Update README.md)
 
 ### Building
 Download python 3.11+ alongside pip and run `pip install git+https://github.com/WingedSeal/jmc.git#subdirectory=src` to install jmc. Inside the root folder, open a command prompt and simply run `jmc compile`, and the datapack will output to src/build.
