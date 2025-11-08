@@ -50,6 +50,33 @@ new advancement (wrench.attack_ui) {
   }
 }
 
+Scoreboard.add(__crop__);
+
+Scoreboard.add(__rop0__);
+Scoreboard.add(__rop1__);
+Scoreboard.add(__rop2__);
+Scoreboard.add(__rop3__);
+Scoreboard.add(__rop4__);
+Scoreboard.add(__rop5__);
+
+@lazy function rotate_rods (rodRotation) {
+    @s::Tags = ui::element_info.rod.$rodRotation.tags;
+    @s::CustomName = ui::element_info.rod.$rodRotation.display;
+
+    if (data entity @s block_state{Name:"minecraft:end_rod"}) {
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
+    } else {
+        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.lightning_rod_facing;
+    }
+}
+
+@lazy function rotate_stairs (stairRotation) {
+    @s::Tags = ui::element_info.stair.$stairRotation.tags;
+    @s::CustomName = ui::element_info.stair.$stairRotation.display;
+    @s::block_state.Properties.half = ui::element_info.stair.$stairRotation.half;
+    @s::block_state.Properties.facing = ui::element_info.stair.$stairRotation.facing;
+}
+
 @add(__tick__)
 function zzz_.wrench_display () {
     execute as @a run 
@@ -291,93 +318,222 @@ function zzz_.rotation_display () {
     
 }
 
-@lazy function rotate_rods (rodRotation) {
-    @s::Tags = ui::element_info.rod.$rodRotation.tags;
-    @s::CustomName = ui::element_info.rod.$rodRotation.display;
-
-    if (data entity @s block_state{Name:"minecraft:end_rod"}) {
-        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.end_rod_facing;
-    } else {
-        @s::block_state.Properties.facing = ui::element_info.rod.$rodRotation.lightning_rod_facing;
-    }
-}
-
-@lazy function rotate_stairs (stairRotation) {
-    @s::Tags = ui::element_info.stair.$stairRotation.tags;
-    @s::CustomName = ui::element_info.stair.$stairRotation.display;
-    @s::block_state.Properties.half = ui::element_info.stair.$stairRotation.half;
-    @s::block_state.Properties.facing = ui::element_info.stair.$stairRotation.facing;
-}
-
 function zzz_.rotate_wires () {
     Advancement.revoke(@s,only,wrench/attack_ui);
 
     $id = __playerId__:@s;
     execute at _highlight_ run 
     {
-        if (items entity @s weapon.* #mclg:wires/rods) {
-            __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
+        if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sneak:1b}}}}){
+            __crop__:@s := (__crop__:@s + 1) % 3;
+            __cpp__:@s = -1;
+            __crp__:@s = -1;
 
-        } else if (items entity @s weapon.* #mclg:wires/stairs) {
-            __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
+            if (__crop__:@s = 0) {
+                ui::rotatePos = _highlight_::Pos;
+                __rop0__:@s = ui::rotatePos[0] * 100;
+                __rop1__:@s = ui::rotatePos[1] * 100;
+                __rop2__:@s = ui::rotatePos[2] * 100;
 
-        } else if (items entity @s weapon.* minecraft:sea_lantern) {
+                tellraw @s "Set Point 1";
+            } else if (__crop__:@s = 1) {
+                ui::rotatePos = _highlight_::Pos;
+                __rop3__:@s = ui::rotatePos[0] * 100;
+                __rop4__:@s = ui::rotatePos[1] * 100;
+                __rop5__:@s = ui::rotatePos[2] * 100;
 
-            if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b}}}}) {
-                __gateOrientation__:@s := (__gateOrientation__:@s + 1) % 2;
+                tellraw @s "Set Point 2. Left click to confirm.";
             } else {
-                __gateType__:@s := (__gateType__:@s + 1) % 7;
+
+                if (__rop0__:@s > __rop3__:@s) {__rop0__:@s >< __rop3__:@s;}
+                if (__rop1__:@s > __rop4__:@s) {__rop1__:@s >< __rop4__:@s;}
+                if (__rop2__:@s > __rop5__:@s) {__rop2__:@s >< __rop5__:@s;}
+
+                $rotateVolume = 0;
+
+                $min_x = __rop0__:@s;
+                $min_y = __rop1__:@s;
+                $min_z = __rop2__:@s;
+                $max_x = __rop3__:@s;
+                $max_y = __rop4__:@s;
+                $max_z = __rop5__:@s;
+
+                if (!__rop0__:@s = __rop3__:@s) {
+                    $centerX := ($max_x + $min_x) / 2;
+                    $useAxis = 0;
+                } else if (!__rop2__:@s = __rop5__:@s){
+                    $centerX := ($max_z + $min_z) / 2;
+                    $useAxis = 2;
+                } else {
+                    $useAxis = 3;
+                    $yaw = _highlight_::Rotation[0];
+
+                    if ($yaw = 0 || $yaw = 180) {
+                        $centerX := ($max_x + $min_x) / 2;
+                    } else {
+                        $centerX := ($max_z + $min_z) / 2;
+                    }
+
+                }
+
+                $centerY := ($max_y + $min_y) / 2;
+                
+                $centerXCheck := $centerX % 25;
+                $centerYCheck := $centerY % 25;
+
+                if ($centerXCheck = 12) {
+                    $centerX += 13;
+                } else if ($centerXCheck = 13) {
+                    $centerX += 12;
+                }
+
+                if ($centerYCheck = 12) {
+                    $centerY += 13;
+                } else if ($centerYCheck = 13) {
+                    $centerY += 12;
+                }
+
+                tag @s add lg.rotating;
+                execute as @e[type=block_display,distance=..1000,tag=lg.uiElement,predicate=mclg:between_points] run {
+
+                    ui::rotatePos = @s::Pos;
+
+                    $xpos := $centerX + (__pos1__:@s - $centerY);
+                    
+                    if ($useAxis = 0) {
+                        $ypos := $centerY - (__pos0__:@s - $centerX);
+
+                        ui::rotatePos[0] = 100 * ui::rotatePos[0];
+                        ui::rotatePos[0] = $xpos;
+                        ui::rotatePos[1] = $ypos;
+                        __pos0__:@s = $xpos;
+                        __pos1__:@s = $ypos;
+
+                        @s::Pos[0] = 0.01 * (double) ui::rotatePos[0];
+                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+
+                    } else if ($useAxis = 2) {
+                        $ypos := $centerY - (__pos2__:@s - $centerX);
+
+                        ui::rotatePos[2] = 100 * ui::rotatePos[2];
+                        ui::rotatePos[2] = $xpos;
+                        ui::rotatePos[1] = $ypos;
+                        __pos2__:@s = $xpos;
+                        __pos1__:@s = $ypos;
+
+                        @s::Pos[2] = 0.01 * (double) ui::rotatePos[2];
+                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+
+                    } else if ($useAxis = 3) {
+                        say "hi";
+                        if ($yaw = 0 || $yaw = 180)
+                        {$ypos := $centerY - (__pos0__:@s - $centerX);} else
+                        {$ypos := $centerY - (__pos2__:@s - $centerX);}
+
+                        ui::rotatePos[1] = $ypos;
+                        __pos1__:@s = $ypos;
+
+                        @s::Pos[1] = 0.01 * (double) ui::rotatePos[1];
+                    }
+
+                    if (entity @s[tag=lg.stair]) {
+                        switch (__stairRotation__:@s) {
+                            case 0:
+                                rotate_stairs(2);
+                                __stairRotation__:@s = 2;
+                            case 1:
+                                rotate_stairs(0);
+                                __stairRotation__:@s = 0;
+                            case 2:
+                                rotate_stairs(3);
+                                __stairRotation__:@s = 3;
+                            case 3:
+                                rotate_stairs(1);
+                                __stairRotation__:@s = 1;                                
+                        }
+                    } else if (entity @s[tag=lg.rod]) {
+                        __rodRotation__:@s := (__rodRotation__:@s - 1) % 4;
+                        switch (__rodRotation__:@s) {
+                            case 0:
+                                rotate_rods(0);
+                            case 1:
+                                rotate_rods(1);
+                            case 2:
+                                rotate_rods(2);
+                            case 3:
+                                rotate_rods(3);
+                        }
+                    }
+                }
+                tag @s remove lg.rotating;
             }
 
-        } else if (entity _uiElement_) {
+        } else {
 
-            execute as _uiElement_ run {
+            if (items entity @s weapon.* #mclg:wires/rods) {
+                __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
 
-                if (entity @s[tag=lg.rod]) {
+            } else if (items entity @s weapon.* #mclg:wires/stairs) {
+                __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
 
-                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
-                    tag @s add lg.removing;
-                    zzz_.bfs.backward.get_type();
+            } else if (items entity @s weapon.* minecraft:sea_lantern) {
 
-                    __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
-                    
-                    switch (__rodRotation__:@s) {
-                        case 0:
-                            rotate_rods(0);
-                        case 1:
-                            rotate_rods(1);
-                        case 2:
-                            rotate_rods(2);
-                        case 3:
-                            rotate_rods(3);
+                if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b}}}}) {
+                    __gateOrientation__:@s := (__gateOrientation__:@s + 1) % 2;
+                } else {
+                    __gateType__:@s := (__gateType__:@s + 1) % 7;
+                }
+
+            } else if (entity _uiElement_) {
+
+                execute as _uiElement_ run {
+
+                    if (entity @s[tag=lg.rod]) {
+
+                        tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                        tag @s add lg.removing;
+                        zzz_.bfs.backward.get_type();
+
+                        __rodRotation__:@s := (__rodRotation__:@s + 1) % 4;
+                        
+                        switch (__rodRotation__:@s) {
+                            case 0:
+                                rotate_rods(0);
+                            case 1:
+                                rotate_rods(1);
+                            case 2:
+                                rotate_rods(2);
+                            case 3:
+                                rotate_rods(3);
+                        }
+
+                        tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                        tag @s remove lg.removing;
+                        zzz_.bfs.backward.get_type(); 
+
+                    } else if (entity @s[tag=lg.stair]) {
+
+                        tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                        tag @s add lg.removing;
+                        zzz_.bfs.backward.get_type();
+
+                        __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
+
+                        switch (__stairRotation__:@s) {
+                            case 0:
+                                rotate_stairs(0);
+                            case 1:
+                                rotate_stairs(1);
+                            case 2:
+                                rotate_stairs(2);
+                            case 3:
+                                rotate_stairs(3);
+                        }
+
+                        tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
+                        tag @s remove lg.removing;
+                        zzz_.bfs.backward.get_type(); 
                     }
-
-                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
-                    tag @s remove lg.removing;
-                    zzz_.bfs.backward.get_type(); 
-
-                } else if (entity @s[tag=lg.stair]) {
-
-                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
-                    tag @s add lg.removing;
-                    zzz_.bfs.backward.get_type();
-
-                    __stairRotation__:@s := (__stairRotation__:@s + 1) % 4;
-
-                    switch (__stairRotation__:@s) {
-                        case 0:
-                            rotate_stairs(0);
-                        case 1:
-                            rotate_stairs(1);
-                        case 2:
-                            rotate_stairs(2);
-                        case 3:
-                            rotate_stairs(3);
-                    }
-
-                    tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
-                    tag @s remove lg.removing;
-                    zzz_.bfs.backward.get_type(); 
                 }
             }
         }

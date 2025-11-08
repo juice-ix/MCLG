@@ -494,7 +494,7 @@ class zzz_.ui.place {
                     for ($z = __pp2__:@s; $z <= __pp5__:@s; $z += 25) {
                         
                         // Summon ui element unless there's another one in the current position
-                        if (!entity @e[distance=..250,predicate=mclg:place_uielement/at_current_cell,limit = 2]) {
+                        if (!entity @e[type=block_display,tag=lg.uiElement,distance=..250,predicate=mclg:place_uielement/at_current_cell,limit = 2]) {
                             $fillVolume++;
                             execute summon block_display run {
                                 rotate @s ~ ~;
@@ -652,11 +652,16 @@ class zzz_.ui.place {
     @lazy function chip.store_data () {
         tag @s remove lg.chip_build;
         execute if entity @s[tag=lg.starter] run tag @s remove lg.starter;
-        if (!__pp0__:@p[tag=lg.saving,distance=..250] = __pp3__:@p[tag=lg.saving,distance=..250]) {$relPos_x := {@s::Pos[0] * 100} - $chipStart_x;} 
-        else {$relPos_x := {@s::Pos[2] * 100} - $chipStart_z;}
+        if (!__pp0__:@p[tag=lg.saving,distance=..250] = __pp3__:@p[tag=lg.saving,distance=..250]) {
+            $relPos_x := {@s::Pos[0] * 100} - $chipStart_x;
+        } else {
+            $relPos_x := {@s::Pos[2] * 100} - $chipStart_z;
+        }
+        
         $relPos_y := {@s::Pos[1] * 100} - $chipStart_y; 
         
-        if ($yaw = 270 || $yaw = 180) {
+        if ($yaw = 270 || $yaw = 180) 
+        {
             $relPos_x *= -1;
         }
 
@@ -760,6 +765,7 @@ class zzz_.ui.place {
             if (!entity _uiElement_ && !items entity @s weapon.mainhand #c:shulker_boxes && items entity @s weapon.mainhand *) {
                 __cpp__:@s = -1;
                 __crp__:@s = -1;
+                __crop__:@s = -1;
                 tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
                 tag @s add lg.placing;
                 execute summon block_display run {
@@ -885,7 +891,7 @@ class zzz_.ui.place {
             } else if (items entity @s weapon.mainhand #c:shulker_boxes[!custom_data~{"lg.chip":1b}]) {
                 __cpp__:@s := (__cpp__:@s + 1) % 3;
                 __crp__:@s = -1;
-
+                __crop__:@s = -1;
                 if (__cpp__:@s = 0) {
                     __pp0__:@s = ui::highlightPos[0] * 100;
                     __pp1__:@s = ui::highlightPos[1] * 100;
@@ -1038,17 +1044,19 @@ class zzz_.ui.place {
 
             __cpp__:@s := (__cpp__:@s + 1) % 3;
             __crp__:@s = -1;
-            
+            __crop__:@s = -1;
             if (__cpp__:@s = 0) {
-                __pp0__:@s = ui::highlightPos[0] * 100;
-                __pp1__:@s = ui::highlightPos[1] * 100;
-                __pp2__:@s = ui::highlightPos[2] * 100;
+                ui::placePos = _highlight_::Pos;
+                __pp0__:@s = ui::placePos[0] * 100;
+                __pp1__:@s = ui::placePos[1] * 100;
+                __pp2__:@s = ui::placePos[2] * 100;
 
                 tellraw @s "Set Point 1";
             } else if (__cpp__:@s = 1) {
-                __pp3__:@s = ui::highlightPos[0] * 100;
-                __pp4__:@s = ui::highlightPos[1] * 100;
-                __pp5__:@s = ui::highlightPos[2] * 100;
+                ui::placePos = _highlight_::Pos;
+                __pp3__:@s = ui::placePos[0] * 100;
+                __pp4__:@s = ui::placePos[1] * 100;
+                __pp5__:@s = ui::placePos[2] * 100;
 
                 tellraw @s "Set Point 2. Right click to confirm.";
             } else {
