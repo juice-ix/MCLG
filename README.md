@@ -5,6 +5,7 @@ Features with a strikethrough are planned but not yet fully implemented.
 
 ## Starting Out
 To start creating logic gate systems, first run `/function mclg:spawn_ui` in chat. 
+Run `/function mclg:give_wrench` to get the wrench item.
 
 To place a single element, right click anywhere in the UI while not spriting.
 To remove a single element, left click anywhere in the UI while not sprinting.
