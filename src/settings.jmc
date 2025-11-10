@@ -8,14 +8,14 @@ new dialog (settings) {
       "label": "UI Settings",
       "action": {
         "type": "minecraft:run_command",
-        "command": "function mclg:jmcignore/settings/show_ui with storage mclg:settings ui"
+        "command": "function mclg:zzz_/settings/show_ui with storage mclg:settings ui"
       }
     },
     {
       "label": "Runtime Settings",
       "action": {
         "type": "minecraft:run_command",
-        "command": "function mclg:jmcignore/settings/show_runtime with storage mclg:settings runtime"
+        "command": "function mclg:zzz_/settings/show_runtime with storage mclg:settings runtime"
       }
     }
   ]
@@ -60,95 +60,10 @@ function zzz_.settings.save_runtime () {
     dialog show @s mclg:settings;
 }
 
-// function jmcignore.settings.show_ui () {
-//     $dialog show @s {
-//         "type": "minecraft:confirmation",
-//         "title": "UI Settings",
-//         "inputs": [
-//             {
-//             "type": "minecraft:number_range",
-//             "key": "uiSize",
-//             "label": "UI Size",
-//             "start": 50,
-//             "end": 1000,
-//             "step": 50,
-//             "initial": $(size)
-//             },
-//             {
-//             "type": "minecraft:boolean",
-//             "key": "showDescription",
-//             "label": "Show Hovered Element Descriptions",
-//             "initial": $(showDescription)
-//             }
-//         ],
-//         "after_action": "close",
-//         "yes": {
-//             "label": "Save",
-//             "action": {
-//             "type": "minecraft:dynamic/run_command",
-//             "template": "function mclg:zzz_/settings/save_ui {uiSize: \u0024(uiSize), showDescription: \u0024(showDescription)}"
-//             }
-//         },
-//         "no": {
-//             "label": "Exit",
-//             "action": {
-//             "type": "minecraft:show_dialog",
-//             "dialog": "mclg:settings"
-//             }
-//         }
-//     };
-// }
+function zzz_.settings.show_ui () {
+    JMC.pythonFile("settings/show_ui", jmc = false);
+}
 
-// function jmcignore.settings.show_runtime () {
-//     dialog show @s {
-//         "type": "minecraft:confirmation",
-//         "title": "Runtime Settings",
-//         "inputs": [
-//             {
-//             "type": "minecraft:number_range",
-//             "key": "ifcl",
-//             "label": "ID Flood Cycle Limit",
-//             "start": 1,
-//             "end": 10000,
-//             "step": 1,
-//             "initial": $(idFloodCycleLimit)
-//             },
-//             {
-//             "type": "minecraft:number_range",
-//             "key": "sfcl",
-//             "label": "Storage Flood Cycle Limit",
-//             "start": 1,
-//             "end": 10000,
-//             "step": 1,
-//             "initial": $(storageFloodCycleLimit)
-//             },
-//             {
-//             "type": "minecraft:boolean",
-//             "key": "cif",
-//             "label": "Continuous ID Flood",
-//             "initial": $(continuousIdFlood)
-//             },
-//             {
-//             "type": "minecraft:boolean",
-//             "key": "csf",
-//             "label": "Continuous Storage Flood",
-//             "initial": $(continuousStorageFlood)
-//             }
-//         ],
-//         "after_action": "close",
-//         "yes": {
-//             "label": "Save",
-//             "action": {
-//             "type": "minecraft:dynamic/run_command",
-//             "template": "function mclg:zzz_/settings/save_runtime {ifcl: $(ifcl), sfcl: $(sfcl), cif: $(cif), csf: $(csf)}"
-//             }
-//         },
-//         "no": {
-//             "label": "Exit",
-//             "action": {
-//             "type": "minecraft:show_dialog",
-//             "dialog": "mclg:settings"
-//             }
-//         }
-//         };
-// }
+function zzz_.settings.show_runtime () {
+    JMC.pythonFile("settings/show_runtime", jmc = false);
+}

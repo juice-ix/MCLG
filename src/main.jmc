@@ -20,6 +20,8 @@ function  __tick__  () {
 
     if ($continuousIdFlood) {
         id_flood();
+    } else if ($continuousStorageFlood) {
+        tellraw @a "test";
     }
 }
 
@@ -29,8 +31,8 @@ import "ui/modify/rotate";
 import "ui/raycast";
 import "ui/spawn";
 import "ui/wrench";
-import "flood/compiled";
 import "flood/id";
+import "flood/compiled";
 import "flood/wire";
 import "settings";
 

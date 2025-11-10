@@ -50,6 +50,30 @@ new advancement (wrench.attack_ui) {
   }
 }
 
+new predicate(matching_starter_id) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__starterId__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$i"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$i"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
 Scoreboard.add(__crop__);
 
 Scoreboard.add(__rop0__);
@@ -58,6 +82,8 @@ Scoreboard.add(__rop2__);
 Scoreboard.add(__rop3__);
 Scoreboard.add(__rop4__);
 Scoreboard.add(__rop5__);
+
+Scoreboard.add(__starterId__);
 
 @lazy function rotate_rods (rodRotation) {
     @s::Tags = ui::element_info.rod.$rodRotation.tags;
@@ -647,45 +673,6 @@ Item.create(
 
 function give_wrench () {
     Item.give(wrench);
-}
-
-function toggle_starter () {
-    $id = __playerId__:@s;
-    execute at _highlight_ as @n[type=block_display,tag=lg.buffer,distance=..0.001] run {
-
-        $state = @s::block_state.Properties.lit;
-        $wireId = __wireId2__:@s;
-
-        if (entity @s[tag=lg.starter]) {
-            tag @s remove lg.starter;
-            tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] remove lg.startsFlood;
-            tellraw @a "Removed starter tag";
-        }
-        else {
-            tag @s add lg.starter;
-            tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] add lg.startsFlood;
-            tellraw @a "Added starter tag";
-        }
-    }
-}
-
-function toggle_bit () {
-    $id = __playerId__:@s;
-    execute at _highlight_ run {
-        execute as @n[tag=lg.buffer,distance=..0.001] run {
-            $state = @s::block_state.Properties.lit;
-            if ($state = 4) {
-                data modify entity @s block_state.Properties.lit set value "false";
-                __output__:@s = 0;
-                if (__bitmask__:@s > 0) {__packs__:$pack_0 -= __bitmask__:@s;}
-            }
-            if ($state = 5) {
-                data modify entity @s block_state.Properties.lit set value "true";
-                __output__:@s = 1;
-                if (__bitmask__:@s) {__packs__:$pack_0 += __bitmask__:@s;}
-            }
-        }
-    }
 }
 
 function set_chip_name () {

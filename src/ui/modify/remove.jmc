@@ -46,11 +46,49 @@ class remove_uielement {
                                         "entity": "this",
                                         "predicate": {
                                             "equipment": {
+                                                "mainhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.rtm": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
                                                 "offhand": {
                                                     "items": "minecraft:stick",
                                                     "components": {
                                                         "minecraft:custom_data": {
                                                             "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "offhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.rtm": true
                                                         }
                                                     }
                                                 }
@@ -125,11 +163,49 @@ class remove_uielement {
                                         "entity": "this",
                                         "predicate": {
                                             "equipment": {
+                                                "mainhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.rtm": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
                                                 "offhand": {
                                                     "items": "minecraft:stick",
                                                     "components": {
                                                         "minecraft:custom_data": {
                                                             "lg.wrench": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "minecraft:entity_properties",
+                                        "entity": "this",
+                                        "predicate": {
+                                            "equipment": {
+                                                "offhand": {
+                                                    "items": "minecraft:stick",
+                                                    "components": {
+                                                        "minecraft:custom_data": {
+                                                            "lg.rtm": true
                                                         }
                                                     }
                                                 }
@@ -245,6 +321,21 @@ class zzz_.ui.remove {
                 kill @e[type=block_display,distance=..0.26,predicate=mclg:matching_gate_id];
             }   
 
+            if (entity @s[tag=lg.starter]) {
+                $loweredId = -1;
+                tag @e[type=block_display,tag=lg.starter,tag=!lg.removing,distance=..250] add lg.lowerId;
+
+                while (entity @e[type=block_display,tag=lg.lowerId,distance=..250]) {
+                    $i = intLimit;
+                    $i < __starterId__:@e[type=block_display,tag=lg.lowerId,distance=..250];
+                    $loweredId++;
+                    
+                    execute as @e[type=block_display,tag=lg.lowerId,distance=..250,predicate=mclg:matching_starter_id] run {
+                        tag @s remove lg.lowerId;
+                        __starterId__:@s = $loweredId;
+                    }
+                }
+            }
             zzz_.bfs.backward.get_type();      
             
             kill @s;
