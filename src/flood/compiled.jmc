@@ -1,4 +1,12 @@
 Scoreboard.add(__outputId__);
+Scoreboard.add(__runtimeTruthId1__);
+Scoreboard.add(__runtimeTruthId2__);
+
+Scoreboard.add(__storageTruthId1__);
+Scoreboard.add(__storageTruthId2__);
+
+Scoreboard.add(__compileTicks__);
+Scoreboard.add(__compileTicksNeeded__);
 
 Scoreboard.add(__crtm__);
 
@@ -61,6 +69,80 @@ new advancement (rtm.attack_ui) {
   }
 }
 
+new predicate(msid) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__starterId__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$j"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                        "name": "$j"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
+new predicate(matching_rti1) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__runtimeTruthId1__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$rTruthId"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$rTruthId"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
+
+new predicate(matching_rti2) {
+    "condition": "minecraft:entity_scores",
+        "entity": "this",
+        "scores": {
+        "__runtimeTruthId2__": {
+            "min": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$rTruthId"
+                },
+                "score": "__variable__"
+            },
+            "max": {
+                "type": "minecraft:score",
+                    "target": {
+                    "type": "minecraft:fixed",
+                    "name": "$rTruthId"
+                },
+                "score": "__variable__"
+            }
+        }
+    }
+}
 Item.create(
     rtm,
     minecraft:stick,
@@ -100,7 +182,7 @@ class zzz_.compile {
             for ($bit = 0; $bit < $n; $bit++) {
                 execute run {
 
-                    $execute store result score $temp __variable__ run data get storage mclg:compile counter[$(0)];
+                    $$temp = compile::counter[$(0)];
                     $sum := $temp + $carry;
 
                     $counter := $sum % 2;
@@ -145,8 +227,7 @@ class zzz_.compile {
 
             for ($i = 0; $i < $nInputs; $i++) {
                 execute run {
-                    $execute store result score @n[type=block_display,tag=lg.starter,distance=..250,predicate=mclg:matching_starter_id] __output__ run 
-                    data get storage mclg:compile inputs[$(0)][$(1)];
+                    $__output__:@n[type=block_display,tag=lg.starter,distance=..250,predicate=mclg:matching_starter_id] = compile::inputs[$(0)][$(1)];
                 } with [$i, $row];
             }
 
@@ -255,12 +336,11 @@ class zzz_.compile {
                 tag @e[type=block_display,tag=lg.dirty,distance=..250] remove lg.dirty;
                 scoreboard players reset @e __prevOutput__;
             }
-            
 
             execute as @e[type=block_display,tag=lg.output,distance=..250] run {
                 execute run {
-                    $data modify storage mclg:compile outputs[$(0)] append value 0;
-                    $execute store result storage mclg:compile outputs[$(0)][-1] int 1 run scoreboard players get @s __output__;
+                    $compile::outputs[$(0)] << 0;
+                    $compile::outputs[$(0)][-1] = __output__:@s;
                 } with [__outputId__:@s];
             }
         }
@@ -279,20 +359,20 @@ class zzz_.compile {
         $id = __playerId__:@s;
 
 
-        if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b}}}}) {
+        if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b,sneak:0b}}}}) {
             execute at _highlight_ as @n[tag=lg.buffer,distance=..0.001] run {
                 $state = @s::block_state.Properties.lit;
                 if ($state = 4) {
-                    data modify entity @s block_state.Properties.lit set value "false";
+                    @s::block_state.Properties.lit = "false";
                     __output__:@s = 0;
                 }
                 if ($state = 5) {
-                    data modify entity @s block_state.Properties.lit set value "true";
+                    @s::block_state.Properties.lit = "true";
                     __output__:@s = 1;
                 }
             }
         }
-        else if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sneak:1b}}}}) {
+        else if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:0b,sneak:1b}}}}) {
                 
             execute at _highlight_ as @n[type=block_display,tag=lg.hasWireId,tag=!lg.gate_input,distance=..0.001] run {
                 $wireId = __wireId2__:@s;
@@ -316,6 +396,11 @@ class zzz_.compile {
                             __starterId__:@s = $loweredId;
                         }
                     }
+                } else if (entity @s[tag=lg.truth_table_input]) {
+                    tag @s add lg.starter;
+                    tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] add lg.startsFlood;
+                    tellraw @a "Added starter to truth table input";
+
                 }
                 else {
                     tag @s add lg.starter;
@@ -327,6 +412,27 @@ class zzz_.compile {
                     $max > __starterId__:@e[type=block_display,tag=lg.starter,distance=..250];
                     $max++;
                     __starterId__:@s = $max;
+                }
+            }
+        }
+        else if (predicate {condition:"minecraft:entity_properties",entity:"this",predicate:{type_specific:{type:"minecraft:player",input:{sprint:1b,sneak:1b}}}}) {
+            if ($currInput < $nTTInputs) {
+                execute at _highlight_ as @n[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.gate_input,distance=..0.001] run {
+                    tag @s add lg.truth_table_input;
+                    __starterId__:@s = $currInput;
+                    __runtimeTruthId2__:@s = $runtimeTruthId;
+                    __storageTruthId2__:@s = $truthId;
+                    __compileTicksNeeded__:@s = $nTTInputs;
+                    $currInput++;
+                }
+
+            } else if ($currInput >= $nTTInputs && $currOutput < $nTTOutputs) {
+                execute at _highlight_ as @n[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.gate_input,distance=..0.001] run {
+                    tag @s add lg.truth_table_output;
+                    __outputId__:@s = $currOutput;
+                    __runtimeTruthId1__:@s = $runtimeTruthId;
+                    __storageTruthId1__:@s = $truthId;
+                    $currOutput++;
                 }
             }
         }
@@ -374,10 +480,135 @@ class zzz_.compile {
 }
 
 function name_truth_table () {   
-    $truth_tables::$(name).del();
-    $truth_tables::$(name).inputs = compile::inputs;
-    $truth_tables::$(name).outputs = compile::outputs;
+    compile::temp.inputs = compile::inputs;
+    compile::temp.outputs = compile::outputs;
+    compile::temp.truthId = $storageTruthId;
+    $compile::temp.name = $(name);
+    truth_tables::tables << compile::temp;
 
     compile::inputs.del();
     compile::outputs.del();
+    compile::temp.del();
+    $storageTruthId++;
+}
+
+function assign_truth_table () {
+    $compile::temp = truth_tables::tables[{name:$(name)}];
+
+    $nTTInputs = compile::temp.inputs;
+    $nTTOutputs = compile::temp.outputs;
+    $truthId = compile::temp.truthId;
+
+    compile::temp.del();
+
+    $currInput = 0;
+    $currOutput = 0;
+
+    $runtimeTruthId++;
+    async while ($currInput < $nTTInputs) {
+        if (!$prevInput = $currInput) {
+            tellraw @a ["Setting Input ", {score:{name:"$currInput",objective:"__variable__"}}];
+        }
+
+        $prevInput = $currInput;
+    } 1t;
+
+    async while ($currOutput < $nTTOutputs) {
+
+        if ($currInput >= $nTTInputs) {
+            if (!$prevOutput = $currOutput) {
+                tellraw @a ["Setting Output ", {score:{name:"$currOutput",objective:"__variable__"}}];
+            }
+
+            $prevOutput = $currOutput;
+        }
+        
+    } 1t;
+}
+
+function compile_complete () {
+    $id = __playerId__:@s;
+    $iterations = 0;
+    $cycle = 0;
+    compile::runtime = [];
+
+    execute at _highlight_ run {
+
+        // Set starting gate bits
+        tag @e[type=block_display,tag=lg.starter,distance=..250] add lg.dirty;
+
+        compile::runtime = [];
+        __compileTicks__:@e[type=block_display,tag=lg.truth_table_input,distance=..250] = 0;
+
+        while (entity @e[type=block_display,tag=lg.dirty,distance=..250] && $cycle < $idFloodCycleLimit) {
+            $cycle++;
+            debug(["=========== Cycle ", {score:{name:"$cycle",objective:"__variable__"}}, " ===========\n"]);
+            execute as @e[type=block_display,tag=lg.dirty,distance=..250] run {
+                
+                tag @s remove lg.dirty;
+
+                // Initialize the ticks score for finding input bits
+                $rTruthId = __runtimeTruthId2__:@s;
+                __compileTicks__:@e[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2]++;
+                if (__compileTicks__:@s = __compileTicksNeeded__:@s) {
+                    execute run {
+                        $compile::runtime << {runtimeTruthId: $(0), storageTruthId: $(1)};
+                    } with [__runtimeTruthId2__:@s, __storageTruthId2__:@s];
+                }
+
+                if (__prevOutput__:@s != __output__:@s) {tag @e[type=block_display,predicate=mclg:matching_rti1,tag=!lg.dirty,distance=..250] add lg.dirty;}
+            }
+        }
+
+        if ($cycle >= $idFloodCycleLimit) {
+            tellraw @a "Circuit exceeded ID flood iteration limit (possible oscillation)";
+            tag @e[type=block_display,tag=lg.dirty] remove lg.dirty;
+            scoreboard players reset @e __prevOutput__;
+        }
+    }
+}
+
+function storage_flood () {
+    $nTruthTables = compile::runtime;
+    $id = __playerId__:@s;
+
+    execute at _highlight_ run {
+        for ($i = 0; $i < $nTruthTables; $i++) {
+            execute run {
+                $compile::temp = compile::runtime[$(0)];
+                $sTruthId = compile::temp.storageTruthId;
+                $rTruthId = compile::temp.runtimeTruthId;
+            } with [$i];
+            
+            execute run {
+                $$nInputs = truth_tables::tables[{truthId:$(0)}].inputs;
+            } with [$sTruthId];
+
+            $index = 0;
+            $nInputs--;
+
+            execute as @e[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2] run {
+                $power_index := $nInputs - __starterId__:@s;
+                execute run {
+                    $$power = math::pow2[$(0)];
+                } with [$power_index];
+
+                $index_add := __output__:@s * $power;
+                $index += $index_add;
+            }
+
+            execute as @e[type=block_display,tag=lg.truth_table_output,distance=..250,predicate=mclg:matching_rti1] run {
+                execute run {
+                    $__output__:@s = truth_tables::tables[{truthId:$(0)}].outputs[$(1)][$(2)];
+                    if (entity @s[tag=lg.buffer]) {
+                        if (__output__:@s = 0) {
+                            @s::block_state.Properties.lit = "false";
+                        } else {
+                            @s::block_state.Properties.lit = "true";
+                        }
+                    }
+                } with [$sTruthId, __outputId__:@s, $index];
+            } 
+        }
+    }
 }
