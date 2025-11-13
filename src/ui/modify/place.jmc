@@ -601,8 +601,8 @@ class zzz_.ui.place {
     }
 
     @lazy function apply_data.gates.vertical (wool,type) {
-        summon block_display ~ ~0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_top"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
-        summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ~ ~0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.noOutput","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_top"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ~ ~-0.25 ~ {Tags:["lg.uiElement","lg.gate","lg.noOutput","lg.gate_input","lg.gate_temp","lg.hasWireId","lg.gate_bottom"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         
         this.set_gateId();
         $max_gate_id = $max;
@@ -628,8 +628,8 @@ class zzz_.ui.place {
         }
     }
     @lazy function apply_data.gates.horizontal (wool,type) {
-        summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
-        summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ^0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.noOutput","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
+        summon block_display ^-0.25 ^ ^ {Tags:["lg.uiElement","lg.gate","lg.noOutput","lg.gate_input","lg.gate_temp","lg.hasWireId"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.25f,0.25f,0.25f]},block_state:{Name:"minecraft:$wool_wool"}};
         this.set_gateId();
         $max_gate_id = $max;
         __gateType__:@s = $type;
@@ -884,16 +884,14 @@ class zzz_.ui.place {
                                 @s::block_state.Name = "red_wool";
                                 tag @s add lg.gate_input;
                                 __gateType__:@s = 3;
-                                zzz_.bfs.backward.get_type();
-                               if (!__wireId2__:@s > 0) {
-                                    $max = 0;
-                                    execute as @e[type=block_display,tag=lg.hasWireId] run {
-                                        $max > __wireId__:@s;
-                                        $max > __wireId2__:@s;
-                                    }
-                                    $max++;
-                                    __wireId2__:@s = $max;
+                                $max = 0;
+                                execute as @e[type=block_display,tag=lg.hasWireId] run {
+                                    $max > __wireId__:@s;
+                                    $max > __wireId2__:@s;
                                 }
+                                $max++;
+                                __wireId2__:@s = $max;
+                                zzz_.bfs.backward.get_type();
 
                             //OR
                             case 4:

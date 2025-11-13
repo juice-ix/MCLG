@@ -598,33 +598,33 @@ class zzz_.bfs {
                 $dir_x = 0;
                 $dir_y = 0;
                 execute positioned ^-0.25 ^ ^ 
-                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] positioned ^0.5 ^ ^
-                    if entity @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] positioned ^-0.25 ^ ^ run {
-                        debug("[Forward]: Bulb traveling west");
+                    unless entity @n[type=block_display,predicate=mclg:bfs/backward/etw,distance=..0.001] positioned ^0.5 ^ ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/backward/wte,distance=..0.001] positioned ^-0.25 ^ ^ run {
+                        debug("[Backward]: Bulb traveling west");
                         $dir_x = 1;
-                        this.forward.bulb_skip({dirX:0.25,dirY:0,predicate:wte});
+                        this.backward.bulb_skip({dirX:0.25,dirY:0,predicate:wte});
                     }
                 execute positioned ^ ^-0.25 ^ 
-                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] positioned ^ ^0.5 ^
-                    if entity @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] positioned ^ ^-0.25 ^ run {
-                        debug("[Forward]: Bulb traveling north");
+                    unless entity @n[type=block_display,predicate=mclg:bfs/backward/stn,distance=..0.001] positioned ^ ^0.5 ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/backward/nts,distance=..0.001] positioned ^ ^-0.25 ^ run {
+                        debug("[Backward]: Bulb traveling north");
                         $dir_y = 1;
-                        this.forward.bulb_skip({dirX:0,dirY:0.25,predicate:nts});
+                        this.backward.bulb_skip({dirX:0,dirY:-0.25,predicate:nts});
                     }
                 if ($dir_x = 0) {
                     execute positioned ^0.25 ^ ^ 
-                        unless entity @n[type=block_display,predicate=mclg:bfs/forward/wte,distance=..0.001] positioned ^-0.5 ^ ^
-                        if entity @n[type=block_display,predicate=mclg:bfs/forward/etw,distance=..0.001] positioned ^0.25 ^ ^ run {
-                            debug("[Forward]: Bulb traveling east");
-                            this.forward.bulb_skip({dirX:-0.25,dirY:0,predicate:etw});
+                        unless entity @n[type=block_display,predicate=mclg:bfs/backward/wte,distance=..0.001] positioned ^-0.5 ^ ^
+                        if entity @n[type=block_display,predicate=mclg:bfs/backward/etw,distance=..0.001] positioned ^0.25 ^ ^ run {
+                            debug("[Backward]: Bulb traveling east");
+                            this.backward.bulb_skip({dirX:-0.25,dirY:0,predicate:etw});
                         }
                 }
                 if ($dir_y = 0) {
                     execute positioned ^ ^0.25 ^ 
-                    unless entity @n[type=block_display,predicate=mclg:bfs/forward/nts,distance=..0.001] positioned ^ ^-0.5 ^
-                    if entity @n[type=block_display,predicate=mclg:bfs/forward/stn,distance=..0.001] positioned ^ ^0.25 ^ run {
-                        debug("[Forward]: Bulb traveling south");
-                        this.forward.bulb_skip({dirX:0,dirY:-0.25,predicate:stn});
+                    unless entity @n[type=block_display,predicate=mclg:bfs/backward/nts,distance=..0.001] positioned ^ ^-0.5 ^
+                    if entity @n[type=block_display,predicate=mclg:bfs/backward/stn,distance=..0.001] positioned ^ ^0.25 ^ run {
+                        debug("[Backward]: Bulb traveling south");
+                        this.backward.bulb_skip({dirX:0,dirY:-0.25,predicate:stn});
                     }  
                 }
                 break;

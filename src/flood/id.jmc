@@ -109,11 +109,12 @@ new predicate(is_connected) {
 
 @lazy function id_flood.get_binary_bits () {
 
-    execute as @e[type=block_display,tag=lg.gate_input,distance=..250,predicate=mclg:matching_gate_id] run {
+    execute as @e[type=block_display,tag=lg.gate_input,distance=..26,predicate=mclg:matching_gate_id] run {
         $ticks++;
 
+        $in = 0;
         $wireId = __wireId__:@s;
-        execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {
+        execute as @n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id] run {
             $in = __output__:@s;
         }
 
@@ -144,14 +145,11 @@ function id_flood () {
                 
                 tag @s remove lg.dirty;
 
-                // Initialize the ticks score for finding input bits
-                $ticks = -1;
-
-                $gateId = __gateId__:@s;
                 if (entity @s[tag=lg.truth_table_input]) {
                     $wireId = __wireId__:@s;
-                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
-                    execute if entity @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {__output__:@s = $in;}
+
+                    debug(["---------", {color:white, text:" Truth Table Input "}, "----------"]);
+                    __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                     
                     if (entity @s[tag=lg.buffer]) {
                         if (__output__:@s = 0) {
@@ -163,25 +161,18 @@ function id_flood () {
 
                     $rTruthId = __runtimeTruthId2__:@s;
                     $nInputs = __truthInputCount__:@s;
-                    $isDifferent = false;
-
+                    $outputIndex = 0;
+                    $sameCount = 0;
+                    
                     execute as @e[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2] run {
-                        if (__output__:@s != __prevOutput__:@s && !$isDifferent) {
-                            $isDifferent = true;
+                        if (__prevOutput__:@s = __output__:@s) {
+                            $sameCount++;
                         }
-                        __prevOutput__:@s = __output__:@s;
+                        $indexAdd :=  __output__:@s * __truthPower__:@s;
+                        $outputIndex += $indexAdd;
                     }
-
-                    if ($isDifferent) {
-                        $outputIndex = 0;
-
-                        for ($j = 0; $j < $nInputs; $j++) {
-                            $power = __truthPower__:@n[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2,predicate=mclg:mtid];
-                            $out = __output__:@n[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2,predicate=mclg:mtid];
-                            $index_add := $out * $power;
-                            $outputIndex += $index_add;
-                        }
-
+                    
+                    if (!$sameCount = $nInputs) {
                         execute as @e[type=block_display,tag=lg.truth_table_output,distance=..250,predicate=mclg:matching_rti1] run {
                             execute run {
                                 $__output__:@s = truth_tables::tables[$(0)].outputs[$(1)][$(2)];
@@ -199,18 +190,19 @@ function id_flood () {
                                 __prevOutput__:@s = __output__:@s; 
                                 
                             } with [__storageTruthIndex1__:@s, __truthOutputId__:@s, $outputIndex];
-                        }
+                        } 
                     }
-
+                    
+                    __prevOutput__:@s = __output__:@s;
                 } else if (entity @s[tag=lg.buffer]) {
                     debug(["---------", {color:white, text:" Buffer "}, "----------"]);
                     $wireId = __wireId__:@s;
-                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                    __output__:@s = 0;
+                    __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                         
-                    debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);
-                    __output__:@s := $in;
+                    debug(["|                Bit: ", {score:{name:"@s",objective:"__output__"}}, "               |"]);
                     
-                    if ($in = 0) {
+                    if (__output__:@s = 0) {
                         @s::block_state.Properties.lit = "false";
                     } else {
                         @s::block_state.Properties.lit = "true";
@@ -219,12 +211,14 @@ function id_flood () {
                 } else if (entity @s[tag=lg.target]) {
                     debug(["---------", {color:white, text:" Target "}, "----------"]);
                     $wireId = __wireId__:@s;
-                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                    __output__:@s = 0;
+                    __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                         
-                    debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);
-                    __output__:@s := $in;
+                    debug(["|                Bit: ", {score:{name:"@s",objective:"__output__"}}, "               |"]);
                     $wireId = __wireId2__:@s;
                 } else {
+                    $ticks = -1;
+                    $gateId = __gateId__:@s;
                     // Compute
                     switch (__gateType__:@s) {
 
@@ -254,14 +248,13 @@ function id_flood () {
                             debug(["-----------", {color:red, text:" NOT "}, "-----------"]);  
 
                             $wireId = __wireId__:@s;
+                            __output__:@s = 0;
+                            __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
+                            debug(["|                 Bit: ", {score:{name:"@s",objective:"__output__"}}]);
 
-                            execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {
-                                $in = __output__:@s;
-                                debug(["|                 Bit: ", {score:{name:"$in",objective:"__variable__"}}]);
-                            }       
-                            __output__:@s := $in * -1 + 1;
+                            __output__:@s *= -1;
+                            __output__:@s += 1;
                             $wireId = __wireId2__:@s;
-
                         // Two input OR gate
                         case 4:
                             debug(["-----------", {color:dark_aqua, text:" OR "}, "-----------"]);

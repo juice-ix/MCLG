@@ -259,15 +259,13 @@ class zzz_.compile {
                     execute as @e[type=block_display,tag=lg.dirty,distance=..250] run {
                         
                         tag @s remove lg.dirty;
-
-                        // Initialize the ticks score for finding input bits
-                        $ticks = -1;
-
-                        $gateId = __gateId__:@s;
+                        
                         if (entity @s[tag=lg.truth_table_input]) {
                             $wireId = __wireId__:@s;
-                            execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
-                            execute if entity @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {__output__:@s = $in;}
+
+                            debug(["---------", {color:white, text:" Truth Table Input "}, "----------"]);
+                            __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
+                            
                             if (entity @s[tag=lg.buffer]) {
                                 if (__output__:@s = 0) {
                                     @s::block_state.Properties.lit = "false";
@@ -277,48 +275,48 @@ class zzz_.compile {
                             }
 
                             $rTruthId = __runtimeTruthId2__:@s;
-                            $n_Inputs = execute if entity @e[type=block_display,predicate=mclg:matching_rti2,distance=..250];
+                            $n_Inputs = __truthInputCount__:@s;
                             $outputIndex = 0;
-
-                            for ($j = 0; $j < $n_Inputs; $j++) {
-                                execute run {$$power = math::pow2[$(0)];} with [$j];
-                                $out = __output__:@n[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2,predicate=mclg:mtid];
-                                $index_add := $out * $power;
-                                $outputIndex += $index_add;
-                            }
-
-                            execute as @e[type=block_display,tag=lg.truth_table_output,distance=..250,predicate=mclg:matching_rti1] run {
-                                execute run {
-                                    $__output__:@s = truth_tables::tables[$(0)].outputs[$(1)][$(2)];
-                                    
-                                    if (__prevOutput__:@s != __output__:@s) {
-                                        $wireId = __wireId2__:@s;
-
-                                        if (entity @s[tag=lg.buffer]) {
-                                            if (__output__:@s = 0) {
-                                                @s::block_state.Properties.lit = "false";
-                                            } else {
-                                                @s::block_state.Properties.lit = "true";
-                                            }
-                                        }
-
-                                        tag @e[type=block_display,predicate=mclg:is_connected,predicate=mclg:between_points,distance=..250] add lg.dirty;
-                                    }
-                                    __prevOutput__:@s = __output__:@s; 
-                                    
-                                } with [__storageTruthIndex1__:@s, __truthOutputId__:@s, $outputIndex];
+                            $sameCount = 0;
+                            
+                            execute as @e[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2] run {
+                                if (__prevOutput__:@s = __output__:@s) {
+                                    $sameCount++;
+                                }
+                                $indexAdd :=  __output__:@s * __truthPower__:@s;
+                                $outputIndex += $indexAdd;
                             }
                             
-
+                            if (!$sameCount = $n_Inputs) {
+                                execute as @e[type=block_display,tag=lg.truth_table_output,distance=..250,predicate=mclg:matching_rti1] run {
+                                    execute run {
+                                        $__output__:@s = truth_tables::tables[$(0)].outputs[$(1)][$(2)];
+                                        if (__prevOutput__:@s != __output__:@s) {
+                                            $wireId = __wireId2__:@s;
+                                            if (entity @s[tag=lg.buffer]) {
+                                                if (__output__:@s = 0) {
+                                                    @s::block_state.Properties.lit = "false";
+                                                } else {
+                                                    @s::block_state.Properties.lit = "true";
+                                                }
+                                            }
+                                            tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;
+                                        }
+                                        __prevOutput__:@s = __output__:@s; 
+                                        
+                                    } with [__storageTruthIndex1__:@s, __truthOutputId__:@s, $outputIndex];
+                                } 
+                            }
+                            
+                            __prevOutput__:@s = __output__:@s;
                         } else if (entity @s[tag=lg.buffer]) {
                             debug(["---------", {color:white, text:" Buffer "}, "----------"]);
                             $wireId = __wireId__:@s;
-                            execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                            __output__:@s = 0;
+                            __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                                 
-                            debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);
-                            __output__:@s := $in;
-                            
-                            if ($in = 0) {
+                            debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);                            
+                            if (__output__:@s = 0) {
                                 @s::block_state.Properties.lit = "false";
                             } else {
                                 @s::block_state.Properties.lit = "true";
@@ -327,12 +325,15 @@ class zzz_.compile {
                         } else if (entity @s[tag=lg.target]) {
                             debug(["---------", {color:white, text:" Target "}, "----------"]);
                             $wireId = __wireId__:@s;
-                            execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                            __output__:@s = 0;
+                            __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                                 
                             debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);
                             __output__:@s := $in;
                             $wireId = __wireId2__:@s;
                         } else {
+                            $ticks = -1;
+                            $gateId = __gateId__:@s;
                             // Compute
                             switch (__gateType__:@s) {
 
@@ -362,12 +363,11 @@ class zzz_.compile {
                                     debug(["-----------", {color:red, text:" NOT "}, "-----------"]);  
 
                                     $wireId = __wireId__:@s;
-
-                                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {
-                                        $in = __output__:@s;
-                                        debug(["|                 Bit: ", {score:{name:"$in",objective:"__variable__"}}]);
-                                    }       
-                                    __output__:@s := $in * -1 + 1;
+                                    __output__:@s = 0;
+                                    __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
+                                    
+                                    __output__:@s *= -1;
+                                    __output__:@s += 1;
                                     $wireId = __wireId2__:@s;
 
                                 // Two input OR gate

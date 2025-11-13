@@ -221,7 +221,7 @@ function zzz_.wrench_display () {
                                     } break;
                                     else 
                                     {
-                                        if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId__:@s;}
+                                        if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId2__:@s;}
                                         if ($display_cwid1 != __connectedWireId1__:@s) {$display_cwid1 = __connectedWireId1__:@s;}
                                         if ($display_cwid2 != __connectedWireId2__:@s) {$display_cwid2 = __connectedWireId2__:@s;}
                                         
