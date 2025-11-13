@@ -27,6 +27,13 @@ class bfs.backward {
                 "condition": "minecraft:entity_properties",
                 "entity": "this",
                 "predicate": {
+                    "nbt": "{Tags:[\"lg.target\"]}"
+                }
+            },
+            {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
                     "nbt": "{Tags:[\"lg.grate\"]}"
                 }
             },
@@ -62,6 +69,13 @@ class bfs.backward {
                     "predicate": {
                         "nbt": "{Tags:[\"lg.buffer\"]}"
                     }
+                },
+                {
+                "condition": "minecraft:entity_properties",
+                "entity": "this",
+                "predicate": {
+                    "nbt": "{Tags:[\"lg.target\"]}"
+                }
                 },
                 {
                     "condition": "minecraft:entity_properties",
@@ -102,6 +116,13 @@ class bfs.backward {
                     "predicate": {
                         "nbt": "{Tags:[\"lg.buffer\"]}"
                     }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
                 },
                 {
                     "condition": "minecraft:entity_properties",
@@ -147,6 +168,13 @@ class bfs.backward {
                     "condition": "minecraft:entity_properties",
                     "entity": "this",
                     "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
                         "nbt": "{Tags:[\"lg.grate\"]}"
                     }
                 },
@@ -187,6 +215,13 @@ class bfs.forward {
                 }
             },
             {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
+                },
+            {
                 "condition": "minecraft:entity_properties",
                 "entity": "this",
                 "predicate": {
@@ -225,6 +260,13 @@ class bfs.forward {
                     "predicate": {
                         "nbt": "{Tags:[\"lg.buffer\"]}"
                     }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
                 },
                 {
                     "condition": "minecraft:entity_properties",
@@ -270,6 +312,13 @@ class bfs.forward {
                     "condition": "minecraft:entity_properties",
                     "entity": "this",
                     "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
                         "nbt": "{Tags:[\"lg.grate\"]}"
                     }
                 },
@@ -305,6 +354,13 @@ class bfs.forward {
                     "predicate": {
                         "nbt": "{Tags:[\"lg.buffer\"]}"
                     }
+                },
+                {
+                    "condition": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "nbt": "{Tags:[\"lg.target\"]}"
+                        }
                 },
                 {
                     "condition": "minecraft:entity_properties",

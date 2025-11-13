@@ -309,6 +309,7 @@ class zzz_.ui.remove {
         __cpp__:@s = -1;
         __crp__:@s = -1;
         __crop__:@s = -1;
+        __crtm__:@s = -1;
         $id = __playerId__:@s;
 
         execute at _highlight_ as @n[type=block_display, tag=lg.uiElement, distance=..0.001] at @s run {

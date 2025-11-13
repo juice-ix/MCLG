@@ -148,7 +148,61 @@ function id_flood () {
                 $ticks = -1;
 
                 $gateId = __gateId__:@s;
-                if (entity @s[tag=lg.buffer]) {
+                if (entity @s[tag=lg.truth_table_input]) {
+                    $wireId = __wireId__:@s;
+                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                    execute if entity @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {__output__:@s = $in;}
+                    
+                    if (entity @s[tag=lg.buffer]) {
+                        if (__output__:@s = 0) {
+                            @s::block_state.Properties.lit = "false";
+                        } else {
+                            @s::block_state.Properties.lit = "true";
+                        }
+                    }
+
+                    $rTruthId = __runtimeTruthId2__:@s;
+                    $nInputs = __truthInputCount__:@s;
+                    $isDifferent = false;
+
+                    execute as @e[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2] run {
+                        if (__output__:@s != __prevOutput__:@s && !$isDifferent) {
+                            $isDifferent = true;
+                        }
+                        __prevOutput__:@s = __output__:@s;
+                    }
+
+                    if ($isDifferent) {
+                        $outputIndex = 0;
+
+                        for ($j = 0; $j < $nInputs; $j++) {
+                            $power = __truthPower__:@n[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2,predicate=mclg:mtid];
+                            $out = __output__:@n[type=block_display,tag=lg.truth_table_input,distance=..250,predicate=mclg:matching_rti2,predicate=mclg:mtid];
+                            $index_add := $out * $power;
+                            $outputIndex += $index_add;
+                        }
+
+                        execute as @e[type=block_display,tag=lg.truth_table_output,distance=..250,predicate=mclg:matching_rti1] run {
+                            execute run {
+                                $__output__:@s = truth_tables::tables[$(0)].outputs[$(1)][$(2)];
+                                if (__prevOutput__:@s != __output__:@s) {
+                                    $wireId = __wireId2__:@s;
+                                    if (entity @s[tag=lg.buffer]) {
+                                        if (__output__:@s = 0) {
+                                            @s::block_state.Properties.lit = "false";
+                                        } else {
+                                            @s::block_state.Properties.lit = "true";
+                                        }
+                                    }
+                                    tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;
+                                }
+                                __prevOutput__:@s = __output__:@s; 
+                                
+                            } with [__storageTruthIndex1__:@s, __truthOutputId__:@s, $outputIndex];
+                        }
+                    }
+
+                } else if (entity @s[tag=lg.buffer]) {
                     debug(["---------", {color:white, text:" Buffer "}, "----------"]);
                     $wireId = __wireId__:@s;
                     execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
@@ -161,6 +215,14 @@ function id_flood () {
                     } else {
                         @s::block_state.Properties.lit = "true";
                     }
+                    $wireId = __wireId2__:@s;
+                } else if (entity @s[tag=lg.target]) {
+                    debug(["---------", {color:white, text:" Target "}, "----------"]);
+                    $wireId = __wireId__:@s;
+                    execute as @n[type=block_display,tag=!lg.gate_input,distance=..250,predicate=mclg:matching_wire_id] run {$in = __output__:@s;}
+                        
+                    debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);
+                    __output__:@s := $in;
                     $wireId = __wireId2__:@s;
                 } else {
                     // Compute
@@ -232,6 +294,7 @@ function id_flood () {
             }
         }
 
+        compile::temp.del();
         if ($cycle >= $idFloodCycleLimit) {
             tellraw @a "Circuit exceeded ID flood iteration limit (possible oscillation)";
             tag @e[type=block_display,tag=lg.dirty] remove lg.dirty;

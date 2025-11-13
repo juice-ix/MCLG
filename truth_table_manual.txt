@@ -1,0 +1,10 @@
+Truth tables generate from LSB -> MSB in the array, regardless of which inputs have what starter ID.
+However, output ID's are specified by the user before compiling the array by assigning output blocks an outputID.
+This output ID corresponds to it's position within the output array. E.g. output[0] = (__outputId__ = 0)
+
+For a full adder, this means:
+    Cin = input[0]
+    B = input[1]
+    A = input[2]
+
+In ripple carry adders, this pattern applies, except you can ignore Cin, as it's not an input unless it's the first full adder.

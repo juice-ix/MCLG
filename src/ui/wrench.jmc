@@ -208,7 +208,7 @@ function zzz_.wrench_display () {
                                         @n[type=text_display,tag=lg.info_display_bottom,distance=..2,predicate=mclg:matching_highlight_id]::text = "Splits a wire into multiple directions";
                                     }
                                 case 4:
-                                    if (entity @s[tag=lg.buffer]) 
+                                    if (entity @s[tag=lg.buffer] || entity @s[tag=lg.target]) 
                                     {
                                         if ($display_wire_id != __wireId__:@s) {$display_wire_id = __wireId__:@s;}
                                         $out_wire_id = __wireId2__:@s;
@@ -354,7 +354,7 @@ function zzz_.rotate_wires () {
             __crop__:@s := (__crop__:@s + 1) % 3;
             __cpp__:@s = -1;
             __crp__:@s = -1;
-
+            __crtm__:@s = -1;
             if (__crop__:@s = 0) {
                 ui::rotatePos = _highlight_::Pos;
                 __rop0__:@s = ui::rotatePos[0] * 100;

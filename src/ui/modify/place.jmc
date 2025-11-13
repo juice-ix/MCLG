@@ -652,6 +652,7 @@ class zzz_.ui.place {
     @lazy function chip.store_data () {
         tag @s remove lg.chip_build;
         execute if entity @s[tag=lg.starter] run tag @s remove lg.starter;
+        execute if entity @s[tag=lg.output] run tag @s remove lg.output;
         if (!__pp0__:@p[tag=lg.saving,distance=..250] = __pp3__:@p[tag=lg.saving,distance=..250]) {
             $relPos_x := {@s::Pos[0] * 100} - $chipStart_x;
         } else {
@@ -671,7 +672,8 @@ class zzz_.ui.place {
         chip::build.info.rotation.del();
         chip::build.info.gateType.del();
         chip::build.info.connectedWireId.del();
-        
+        chip::build.info.truth.del();
+
         if (entity @s[tag=lg.wire] || entity @s[tag=lg.gate]) {
             chip::build.info.CustomName = @s::CustomName;
             chip::build.info.wireType = __wireType__:@s;
@@ -711,6 +713,29 @@ class zzz_.ui.place {
             chip::build.info.rel_id.connectedWire.1 = $relId_connectedWire1;
         }
         
+        if (entity @s[tag=lg.truth_table]) {
+
+            if (entity @s[tag=lg.truth_table_input]) {
+                chip::build.info.truth.input_id = __truthInputId__:@s;
+                chip::build.info.truth.storageIndex2 = __storageTruthIndex2__:@s;
+                chip::build.info.truth.inputCount = __truthInputCount__:@s;
+                chip::build.info.truth.power = __truthPower__:@s;
+
+                $runtimeTruthId = __runtimeTruthId2__:@s;
+                $runtimeTruthId -= $min_runtimeTruthId;
+                chip::build.info.rel_id.runtimeTruthId2 = $runtimeTruthId;
+            }
+
+            if (entity @s[tag=lg.truth_table_output]) {
+                chip::build.info.truth.output_id = __truthOutputId__:@s;
+                chip::build.info.truth.storageIndex1 = __storageTruthIndex1__:@s;
+
+                $runtimeTruthId = __runtimeTruthId1__:@s;
+                $runtimeTruthId -= $min_runtimeTruthId;
+                chip::build.info.rel_id.runtimeTruthId1 = $runtimeTruthId;
+            }
+        }
+
         chip::build.info.Tags = @s::Tags;
         chip::build.info.block_state = @s::block_state;
         chip::build.info.rel_pos.x = 0.01 * (float) $relPos_x;
@@ -766,6 +791,7 @@ class zzz_.ui.place {
                 __cpp__:@s = -1;
                 __crp__:@s = -1;
                 __crop__:@s = -1;
+                __crtm__:@s = -1;
                 tag @e[type=block_display,tag=lg.uiElement,tag=lg.searched,distance=..250] remove lg.searched;
                 tag @s add lg.placing;
                 execute summon block_display run {
@@ -807,6 +833,20 @@ class zzz_.ui.place {
                         zzz_.bfs.backward.get_type();
                         __output__:@s = 0;
 
+                    } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:target) {
+                        this.apply_data.buffer();
+                        tag @s remove lg.buffer;
+                        tag @s add lg.target;
+                        $max = 0;
+                        execute as @e[type=block_display,tag=lg.hasWireId] run {
+                            $max > __wireId__:@s;
+                            $max > __wireId2__:@s;
+                        }
+                        $max++;
+                        __wireId2__:@s = $max;
+                        zzz_.bfs.backward.get_type();
+                        __output__:@s = 0;
+
                     } else if (items entity @p[tag=lg.placing] weapon.mainhand minecraft:sea_lantern) {
                         @s::Tags = ui::element_info.gate.tags;
                         __connectedWireId1__:@s = 0;
@@ -817,28 +857,28 @@ class zzz_.ui.place {
                         switch (__gateType__:@p[tag=lg.placing]) {
                             //AND
                             case 0:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(lime,0);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(lime,0);
-                                };
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(lime,0);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(lime,0);
+                                }
                             //NAND
                             case 1:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(brown,1);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(brown,1);
-                                };
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(brown,0);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(brown,0);
+                                }
                             //NOR
                             case 2:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(gray,2);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(gray,2);
-                                };
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(gray,2);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(gray,2);
+                                }
                             //NOT
                             case 3:
                                 @s::block_state.Name = "red_wool";
@@ -857,30 +897,28 @@ class zzz_.ui.place {
 
                             //OR
                             case 4:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(cyan,4);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(cyan,4);
-                                };
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(cyan,4);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(cyan,4);
+                                }
                             //XNOR
                             case 5:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(yellow,5);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(yellow,5);
-                                };
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(yellow,5);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(yellow,5);
+                                }
                             //XOR
                             case 6:
-                                switch (__gateOrientation__:@p[tag=lg.placing]) {
-                                    case 0:
-                                        this.apply_data.gates.vertical(orange,6);
-                                    case 1:
-                                        this.apply_data.gates.horizontal(orange,6);
-                                };
-
-                                
+                                if (__gateOrientation__:@p[tag=lg.placing] = 0) {
+                                    this.apply_data.gates.vertical(orange,6);
+                                } break;
+                                else {
+                                    this.apply_data.gates.horizontal(orange,6);
+                                }                                
                         }
 
                     }
@@ -892,6 +930,7 @@ class zzz_.ui.place {
                 __cpp__:@s := (__cpp__:@s + 1) % 3;
                 __crp__:@s = -1;
                 __crop__:@s = -1;
+                __crtm__:@s = -1;
                 if (__cpp__:@s = 0) {
                     __pp0__:@s = ui::highlightPos[0] * 100;
                     __pp1__:@s = ui::highlightPos[1] * 100;
@@ -928,11 +967,12 @@ class zzz_.ui.place {
                     $chip_num = 0;
                     $min_gateId = intLimit;
                     $min_wireId = intLimit;
+                    $min_runtimeTruthId = intLimit;
                     $chipId++;
                     $yaw = _highlight_::Rotation[0];
                     $min_gateId < __gateId__:@e[type=block_display,tag=lg.uiElement,tag=lg.gate_output,distance=..250];
                     $min_wireId < __wireId__:@e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,tag=!lg.gate_input,distance=..250];
-                    
+                    $min_runtimeTruthId < __runtimeTruthId2__:@e[type=block_display,tag=lg.truth_table,distance=..250];
                     $min_wireId--;
 
                     debug({score:{name:"$min_wireId",objective:"__variable__"}});
@@ -972,14 +1012,37 @@ class zzz_.ui.place {
                 $place = 0;
                 $max_gateId = 0;
                 $max_wireId = 0;
+                $max_runtimeTruthId = 0;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.hasWireId,distance=..250] run $max_wireId > __wireId2__:@s;
                 execute as @e[type=block_display,tag=lg.uiElement,tag=lg.gate,distance=..250] run $max_gateId > __gateId__:@s;
+                $max_runtimeTruthId > __runtimeTruthId2__:@e[type=block_display,tag=lg.truth_table,distance=..250];
                 $max_gateId++;
                     
                 for ($i = chip::place.arrs; $i > 0; $i--) {
                     for ($j = chip::place.arrs[-1]; $j > 0; $j--) {
                         execute summon block_display run {
                             rotate @s ~ ~;
+
+                            execute run {
+                                $tp @s ^$(x) ^$(y) ^;
+                                $yaw = _highlight_::Rotation[0];
+                                if ($yaw = 0 || $yaw = 180) {@s::Pos[2] = _highlight_::Pos[2];} 
+                                else {@s::Pos[0] = _highlight_::Pos[0];}
+
+                            } with chip::place.arrs[-1][-1].rel_pos;
+
+                            $x = __pos0__:@s = @s::Pos[0] * 100;
+                            $y = __pos1__:@s = @s::Pos[1] * 100;
+                            $z = __pos2__:@s = @s::Pos[2] * 100;
+                            
+                            tag @s add lg.chip_placing;
+                                if (entity @n[type=block_display,tag=lg.uiElement,tag=!lg.chip_placing,predicate=mclg:place_uielement/at_current_cell]) {
+                                    kill @s;
+                                }
+                            tag @s remove lg.chip_placing;
+
+                            if (entity @s[tag=lg.permaStarter,tag=lg.buffer]) {tag @s add lg.starter;}  
+
                             @s::block_state = chip::place.arrs[-1][-1].block_state;
                             @s::CustomName = chip::place.arrs[-1][-1].CustomName;
                             @s::transformation.scale = [0.25f, 0.25f, 0.25f];
@@ -1005,25 +1068,7 @@ class zzz_.ui.place {
                                 }
                                 
                             }
-                            if (entity @s[tag=lg.permaStarter,tag=lg.buffer]) {tag @s add lg.starter;}
-                            execute run {
-                                $tp @s ^$(x) ^$(y) ^;
-                                $yaw = _highlight_::Rotation[0];
-                                if ($yaw = 0 || $yaw = 180) {@s::Pos[2] = _highlight_::Pos[2];} 
-                                else {@s::Pos[0] = _highlight_::Pos[0];}
-
-                            } with chip::place.arrs[-1][-1].rel_pos;
-
-                            $x = __pos0__:@s = @s::Pos[0] * 100;
-                            $y = __pos1__:@s = @s::Pos[1] * 100;
-                            $z = __pos2__:@s = @s::Pos[2] * 100;
-                            
-                            tag @s add lg.chip_placing;
-                                if (entity @n[type=block_display,tag=lg.uiElement,tag=!lg.chip_placing,predicate=mclg:place_uielement/at_current_cell]) {
-                                    kill @s;
-                                }
-                            tag @s remove lg.chip_placing;
-                            
+                           
                             if (entity @s[tag=lg.hasWireId]) {
                                 $currwid = chip::place.arrs[-1][-1].rel_id.wire.1;
                                 if ($currwid = 0) {
@@ -1034,6 +1079,23 @@ class zzz_.ui.place {
                                 
                                 __wireId2__:@s := {chip::place.arrs[-1][-1].rel_id.wire.2} + $max_wireId;
                                 
+                            }
+
+                            if (entity @s[tag=lg.truth_table]) {
+                                if (entity @s[tag=lg.truth_table_input]) {
+                                    __truthInputId__:@s = chip::place.arrs[-1][-1].truth.input_id;
+                                    __truthInputCount__:@s = chip::place.arrs[-1][-1].truth.inputCount;
+                                    __storageTruthIndex2__:@s = chip::place.arrs[-1][-1].truth.storageIndex2;
+                                    __runtimeTruthId2__:@s := {chip::place.arrs[-1][-1].rel_id.runtimeTruthId2} + $max_runtimeTruthId;
+                                    __truthPower__:@s = chip::place.arrs[-1][-1].truth.power;
+
+                                }
+
+                                if (entity @s[tag=lg.truth_table_output]) {
+                                    __truthOutputId__:@s = chip::place.arrs[-1][-1].truth.output_id;
+                                    __storageTruthIndex1__:@s = chip::place.arrs[-1][-1].truth.storageIndex1;
+                                    __runtimeTruthId1__:@s := {chip::place.arrs[-1][-1].rel_id.runtimeTruthId1} + $max_runtimeTruthId;
+                                }
                             }
                         }
                         chip::place.arrs[-1][-1].del();

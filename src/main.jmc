@@ -48,8 +48,6 @@ $uiSize ??= 500;
 $description ??= true;
 
 $chipId ??= -2147483600;
-$runtimeTruthId ??= 0;
-$storageTruthId ??= -intLimit;
 
 settings::ui.size = $uiSize;
 settings::ui.showDescription = $description;
