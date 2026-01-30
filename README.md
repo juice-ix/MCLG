@@ -57,7 +57,7 @@ When assigning, it will prompt you to select your defined inputs and outputs, st
 
 ## Running Circuits
 Once you've linked your inputs and outputs, you can run them. 
-On your initial starting bits (typically lanterns), run `/function mclg:toggle_starter`. ~~You can also do this in bulk with `execute as <target entities> run function mclg:toggle_starters`~~. 
+On your initial starting bits (typically lanterns), run `/function mclg:toggle_starter`.
 Then, you can use either use the command `/function mclg:id_flood` to run the circuit.
 
 ## Settings
