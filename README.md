@@ -6,6 +6,7 @@ Features with a strikethrough are planned but not yet fully implemented.
 ## Starting Out
 To start creating logic gate systems, first run `/function mclg:spawn_ui` in chat. 
 Run `/function mclg:give_wrench` to get the wrench item.
+Run `/function mclg:give_runtime_manager` to get the runtime manager item.
 
 To place a single element, right click anywhere in the UI while not spriting.
 To remove a single element, left click anywhere in the UI while not sprinting.
@@ -19,7 +20,7 @@ To remove an area of elements, left click anywhere in the UI while sprinting. Un
 - Having a filled offhand and mainhand will replace elements that match the one in your offhand with the one in your mainhand.
 
 ## Building circuits
-While you *can* place any element inside the UI, certain elements have special functions:
+While you can place *any* block inside the UI, certain blocks have special functions:
 
 ### Lighting / End Rods
 Carries bits in one direction.
@@ -36,20 +37,30 @@ Splits a wire into at most 3 directions.
 ### Redstone Lamp
 Holds a bit in a state of on or off. When placed as an output, delays propagation by 1 cycle.
 
-### Sea Lantern
-This acts as a block for all gate types, and a select few circuits. By default, there are 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT). Since sequential circuits aren't supported, ~~T flip flops, D flip flops, and JK flip flops are also included~~.
+## Target block
+Just like redstone lanterns, but they don't have a display.
 
-## Saving Circuits
+### Sea Lantern
+This acts as a block for all gate types, and a select few circuits. By default, there are 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT). I tried my best to add support for sequential curcuits, but no guarantees.
+
+## Saving Circuits to be reused for later
 You can use shulkers boxes to save an area of element positions and data relative to a point. To do this, simply right click two points while not sprinting with a shulker box in your mainhand. This will give you a number of shulker boxes.
- - If the selected area contains > 999 ui elements, a new shulker box will be created. This is due to player packet limitations.
+ - If the selected area contains > 999 ui elements, a new shulker box will be created. For some reason, you can only store so much data before it the player gets kicked from the world, causing a softlock.
  - Shulker boxes that are a part of the same circuit are linked by cicruit IDs inside custom data. Placing one will place the full circuit.
- - There are a number of pre-added circuits. Simply do `/function mclg:give` to get a selection of circuits. Alternatively, you can run `/function mclg:give_all` to get every one.
+
+## Creating truth tables
+You can create truth tables of circuits to be reused for later with the runtime manager. To do this, you have to:
+ - Set the starting inputs using the runtime manager.
+ - Set the outputs using the runtime manager.
+ - Select the area you want to use for the truth table.
+This creates the truth table.
+To reuse the truth table, first, give it a name by running `/function mclg:name_truth_table (name:"<name>")`. After this, it's stored with that name, and you can assign it by running `/functoin mclg:assign_truth_table (name:"<name>")`.
+When assigning, it will prompt you to select your defined inputs and outputs, starting at input 0. Both inputs and outputs ordered from closest to the first point when selecting the area to the farthest.
 
 ## Running Circuits
 Once you've linked your inputs and outputs, you can run them. 
 On your initial starting bits (typically lanterns), run `/function mclg:toggle_starter`. ~~You can also do this in bulk with `execute as <target entities> run function mclg:toggle_starters`~~. 
-Then, you can use either use the command `/function mclg:id_flood` to do one quick but slower run, ~~or compile them with `/function mclg:compile`, then run `/function mclg:storage_flood` for a faster but less variable version.~~
-  - If you compile it, any modifications require recompiling before running again.
+Then, you can use either use the command `/function mclg:id_flood` to run the circuit.
 
 ## Settings
 There are a number of settings accessible within the pause menu.
