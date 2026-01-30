@@ -35,7 +35,7 @@ Splits a wire into at most 3 directions.
 ### Redstone Lamp
 Holds a bit in a state of on or off. When placed as an output, delays propagation by 1 cycle.
 
-## Target block
+### Target block
 Just like redstone lanterns, but they don't have a display.
 
 ### Sea Lantern
