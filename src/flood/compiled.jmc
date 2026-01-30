@@ -149,7 +149,8 @@ Item.create(
     minecraft:stick,
     component = [
         custom_data = {lg.rtm:1b},
-        item_name = "Runtime Manager"
+        item_name = "Runtime Manager",
+        lore = [{"color":"white","italic":false,"text":"While not sneaking or sprinting, left click to select the area used for a truth table"},{"color":"white","italic":false,"text":"Sprint + Left click to toggle the state of a buffer"},{"color":"white","italic":false,"text":"Sneak + Left Click to cycle an element through being a starter, an ouput, or neither"},{"color":"white","italic":false,"text":"Sprint + Sneak + Left click after selecting the truth table to assign inputs and outputs"}]
     ]
 );
 
