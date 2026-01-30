@@ -253,7 +253,8 @@ class zzz_.compile {
 
                 // Set starting gate bits
                 tag @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] add lg.dirty;
-
+                tag @e[type=block_display,tag=lg.buffer] remove lg.bufferHasOutput;
+                
                 while (entity @e[type=block_display,tag=lg.dirty,distance=..250] && $cycle < $idFloodCycleLimit) {
                     $cycle++;
                     debug(["=========== Cycle ", {score:{name:"$cycle",objective:"__variable__"}}, " ===========\n"]);

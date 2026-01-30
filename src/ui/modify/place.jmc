@@ -866,10 +866,10 @@ class zzz_.ui.place {
                             //NAND
                             case 1:
                                 if (__gateOrientation__:@p[tag=lg.placing] = 0) {
-                                    this.apply_data.gates.vertical(brown,0);
+                                    this.apply_data.gates.vertical(brown,1);
                                 } break;
                                 else {
-                                    this.apply_data.gates.horizontal(brown,0);
+                                    this.apply_data.gates.horizontal(brown,1);
                                 }
                             //NOR
                             case 2:
