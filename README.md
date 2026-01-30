@@ -1,7 +1,5 @@
-# Minecraft Logic Gates
+# Minecraft Logic Gates for 1.21.11
 Build 2D Logic Gate systems!
-
-Features with a strikethrough are planned but not yet fully implemented.
 
 ## Starting Out
 To start creating logic gate systems, first run `/function mclg:spawn_ui` in chat. 
@@ -37,11 +35,11 @@ Splits a wire into at most 3 directions.
 ### Redstone Lamp
 Holds a bit in a state of on or off. When placed as an output, delays propagation by 1 cycle.
 
-## Target block
+### Target block
 Just like redstone lanterns, but they don't have a display.
 
 ### Sea Lantern
-This acts as a block for all gate types, and a select few circuits. By default, there are 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT). I tried my best to add support for sequential curcuits, but no guarantees.
+This acts as a block for all gate types, including 6 two-input gate types (AND, NAND, NOR, OR, XOR, XNOR) and 1 one-input gate type (NOT). I tried my best to add support for sequential curcuits, but no guarantees.
 
 ## Saving Circuits to be reused for later
 You can use shulkers boxes to save an area of element positions and data relative to a point. To do this, simply right click two points while not sprinting with a shulker box in your mainhand. This will give you a number of shulker boxes.
@@ -67,7 +65,7 @@ There are a number of settings accessible within the pause menu.
 
 ## Installation
 ### Datapack
-First, install [Bookshelf View](https://modrinth.com/datapack/bookshelf-view/version/3.1.1). Then, navigate to releases and download the datapack.zip file you want. Lastly, open your minecraft saves folder, find your world, open the datapacks folder, and copy paste both datapacks inside.
+First, install [Bookshelf View](https://modrinth.com/datapack/bookshelf-view/versions). Then, navigate to releases and download the datapack.zip file you want. Lastly, open your minecraft saves folder, find your world, open the datapacks folder, and copy paste both datapacks inside.
 
 ### Building
-Download python 3.11+ alongside pip and run `pip install git+https://github.com/WingedSeal/jmc.git#subdirectory=src` to install jmc. Inside the root folder, open a command prompt and simply run `jmc compile`, and the datapack will output to src/build.
+Download python 3.11+ alongside pip and run `pip install git+https://github.com/WingedSeal/jmc.git#subdirectory=src` to install jmc. Inside the root folder, open a command prompt and simply run `jmc compile`, and the datapack will output to your specified path.
