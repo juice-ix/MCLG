@@ -397,7 +397,7 @@ class zzz_.compile {
 
                         if (__prevOutput__:@s[tag=!lg.bufferHasOutput] != __output__:@s[tag=!lg.bufferHasOutput]) {
                             tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;
-                            if (entity @s[tag=lg.buffer]) {tag @s add lg.bufferHasOutput;}
+                            if (entity @s[tag=lg.buffer] || entity @s[tag=lg.target]) {tag @s add lg.bufferHasOutput;}
                         }
                         __prevOutput__:@s = __output__:@s; 
                     }
