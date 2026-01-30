@@ -1,8 +1,6 @@
 # Minecraft Logic Gates
 Build 2D Logic Gate systems!
 
-Features with a strikethrough are planned but not yet fully implemented.
-
 ## Starting Out
 To start creating logic gate systems, first run `/function mclg:spawn_ui` in chat. 
 Run `/function mclg:give_wrench` to get the wrench item.
