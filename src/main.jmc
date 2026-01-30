@@ -3,7 +3,7 @@ Scoreboard.add(__playerId__);
 @if(dbg) function debug(text) {
     tellraw @a $text;
 }
-gamerule maxCommandChainLength 1000000;
+gamerule max_command_sequence_length 1000000;
 function  __tick__  () {
     execute as @a unless score @s __playerId__ matches 1.. run {
         __gateOrientation__:@s ??= 0;

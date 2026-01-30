@@ -537,7 +537,6 @@ class zzz_.bfs {
                     $wire_id = __wireId__:@s;
 
                      execute as @n[type=block_display,tag=lg.gate_output,distance=..250,predicate=mclg:matching_gate_id] run {
-                        if ($starter) {tag @s add lg.startsFlood;}
                         if (__connectedWireId1__:@s = 0) {
                             __connectedWireId1__:@s = $wire_id;
                         } else if (__connectedWireId2__:@s = 0) {
@@ -661,11 +660,6 @@ class zzz_.bfs {
                         if (__connectedWireId1__:@s = $wireId) { __connectedWireId1__:@s = 0;} 
                         else if (__connectedWireId2__:@s = $wireId) {__connectedWireId2__:@s = 0;}
                     }
-                    
-                    if (entity @s[tag=lg.starter]) {
-                        $starter = true;
-                        tag @e[type=block_display,tag=!lg.searched,distance=..250,predicate=mclg:is_connected] remove lg.startsFlood;
-                    } else {$starter = false;}
 
                     if (entity @s[tag=!lg.removing]) {
 

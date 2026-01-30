@@ -136,7 +136,8 @@ function id_flood () {
     execute at _highlight_ run {
 
         // Set starting gate bits
-        tag @e[type=block_display,tag=lg.startsFlood,distance=..250] add lg.dirty;
+        tag @e[type=block_display,tag=lg.starter,distance=..250] add lg.dirty;
+        tag @e[type=block_display,tag=lg.buffer] remove lg.bufferHasOutput;
 
         while (entity @e[type=block_display,tag=lg.dirty,distance=..250] && $cycle < $idFloodCycleLimit) {
             $cycle++;
@@ -197,7 +198,6 @@ function id_flood () {
                 } else if (entity @s[tag=lg.buffer]) {
                     debug(["---------", {color:white, text:" Buffer "}, "----------"]);
                     $wireId = __wireId__:@s;
-                    __output__:@s = 0;
                     __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                         
                     debug(["|                Bit: ", {score:{name:"@s",objective:"__output__"}}, "               |"]);
@@ -281,7 +281,10 @@ function id_flood () {
                 
                 debug(["|              Output: ", {score:{name:"@s",objective:"__output__"}}, "              |", "\n--------------------------"]);
 
-                if (__prevOutput__:@s != __output__:@s) {tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;}
+                if (__prevOutput__:@s[tag=!lg.bufferHasOutput] != __output__:@s[tag=!lg.bufferHasOutput]) {
+                    tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;
+                    if (entity @s[tag=lg.buffer]) {tag @s add lg.bufferHasOutput;}
+                }
 
                 __prevOutput__:@s = __output__:@s; 
             }

@@ -3,5 +3,5 @@
     "description": "Create 2D Logic Gate Systems",
     "pack_format": "88",
     "target": "src/main.jmc",
-    "output": "src/build"
+    "output": "C:/Users/Justin/Documents/datapacks/build-mclg"
 }

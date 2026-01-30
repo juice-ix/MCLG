@@ -251,7 +251,7 @@ class zzz_.compile {
                 $cycle = 0;
 
                 // Set starting gate bits
-                tag @e[type=block_display,tag=lg.startsFlood,predicate=mclg:between_points,distance=..250] add lg.dirty;
+                tag @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] add lg.dirty;
 
                 while (entity @e[type=block_display,tag=lg.dirty,distance=..250] && $cycle < $idFloodCycleLimit) {
                     $cycle++;
@@ -312,7 +312,6 @@ class zzz_.compile {
                         } else if (entity @s[tag=lg.buffer]) {
                             debug(["---------", {color:white, text:" Buffer "}, "----------"]);
                             $wireId = __wireId__:@s;
-                            __output__:@s = 0;
                             __output__:@s = __output__:@n[type=block_display,tag=!lg.noOutput,distance=..250,predicate=mclg:matching_wire_id];
                                 
                             debug(["|                Bit: ", {score:{name:"$in",objective:"__variable__"}}, "               |"]);                            
@@ -396,8 +395,10 @@ class zzz_.compile {
                         
                         debug(["|              Output: ", {score:{name:"@s",objective:"__output__"}}, "              |", "\n--------------------------"]);
 
-                        if (__prevOutput__:@s != __output__:@s) {tag @e[type=block_display,predicate=mclg:is_connected,predicate=mclg:between_points,distance=..250] add lg.dirty;}
-
+                        if (__prevOutput__:@s[tag=!lg.bufferHasOutput] != __output__:@s[tag=!lg.bufferHasOutput]) {
+                            tag @e[type=block_display,predicate=mclg:is_connected,distance=..250] add lg.dirty;
+                            if (entity @s[tag=lg.buffer]) {tag @s add lg.bufferHasOutput;}
+                        }
                         __prevOutput__:@s = __output__:@s; 
                     }
                 }
@@ -456,7 +457,6 @@ class zzz_.compile {
                         tag @s remove lg.starter;
 
                         if (entity @s[tag=lg.truth_table_input]) {
-                        tag @s remove lg.startsFlood;
                         tellraw @a "Removed starts flood tag";
 
                         }
@@ -468,7 +468,6 @@ class zzz_.compile {
 
 
                         tag @s add lg.output;
-                        tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] remove lg.startsFlood;
                         tellraw @a "Removed starter tag, added output tag";
 
                         $loweredId = -1;
@@ -507,13 +506,7 @@ class zzz_.compile {
                     } else {
                         tag @s add lg.starter;
 
-                        if (entity @s[tag=lg.truth_table_input]) {
-                            tag @s add lg.startsFlood;
-                            tellraw @a "Added starts flood tag";
-                        }
-
                         __starterId__:@s = -1;
-                        tag @e[type=block_display,distance=..250,predicate=mclg:is_connected] add lg.startsFlood;
                         tellraw @a "Added starter tag";
 
                         $max = -2;
