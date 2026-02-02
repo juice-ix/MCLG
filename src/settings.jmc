@@ -24,6 +24,7 @@ new dialog (settings) {
 new tags.dialog (minecraft.pause_screen_additions) {
     "values" : ["mclg:settings"]
 }
+
 function zzz_.settings.save_ui () {
 
     $respawnUi = false;
@@ -46,6 +47,7 @@ function zzz_.settings.save_runtime () {
     $scoreboard players set $storageFloodCycleLimit __variable__ $(sfcl);   
     $scoreboard players set $continuousIdFlood __variable__ $(cif);
     $scoreboard players set $continuousStorageFlood __variable__ $(csf);
+    $scoreboard players set $simulationsPerTickLimit __variable__ $(sptl);
 
     if ($continuousIdFlood = 1 && $continuousStorageFlood = 1) {
         $continuousIdFlood = 0;
@@ -56,7 +58,7 @@ function zzz_.settings.save_runtime () {
     settings::runtime.storageFloodCycleLimit = $storageFloodCycleLimit;
     settings::runtime.continuousIdFlood = $continuousIdFlood;
     settings::runtime.continuousStorageFlood = $continuousStorageFlood;
-
+    settings::runtime.simulationsPerTickLimit = $simulationsPerTickLimit;
     dialog show @s mclg:settings;
 }
 

@@ -158,52 +158,12 @@ function give_runtime_manager () {
     Item.give(rtm);
 }
 
+$lutInputLimit = 12;
+
 class zzz_.compile {
-        function make_packed_inputs () {
-            $n = execute if entity @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250];  
-            $loop = true;
-
-            compile::inputs = [];
-            compile::counter = [];
-
-            for ($i = 0; $i < $n; $i++) {
-                compile::inputs << [];
-                compile::counter << 0;
-            }
-
-            while ($loop) {
-                
-                for ($bit = 0; $bit < $n; $bit++) {
-                    execute run {
-
-                        $compile::inputs[$(0)] << compile::counter[$(0)];
-                    } with [$bit];
-                }
-
-                $carry = 1;
-                for ($bit = 0; $bit < $n; $bit++) {
-                    execute run {
-
-                        $$temp = compile::counter[$(0)];
-                        $sum := $temp + $carry;
-
-                        $counter := $sum % 2;
-                        $compile::counter[$(0)] = $counter;
-
-                        $carry := $sum / 2;
-                        if ($carry = 0) {$bit = $n;}
-
-                    } with [$bit];
-                }
-
-                if ($carry = 1) {$loop = false;}
-            }
-
-            compile::counter.del();
-        }
-
         function make_packed_outputs () {
             compile::outputs = [];
+            
             execute as @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] run {
                 __bit1__:@s = __starterId__:@s;
 
@@ -220,7 +180,6 @@ class zzz_.compile {
                     }
                 }
             }
-
             execute as @e[type=block_display,tag=lg.output,predicate=mclg:between_points,distance=..250] run {
                 compile::outputs << [];
                 __bit1__:@s = __outputId__:@s;
@@ -239,17 +198,28 @@ class zzz_.compile {
                 }
             }
 
-            $nRows = compile::inputs[0];
-            $nInputs = compile::inputs;
+            $nInputs = execute if entity @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250]; 
 
-            for ($row = 0; $row < $nRows; $row++) {
-                for ($i = 0; $i < $nInputs; $i++) {
-                    execute run {
-                        $__output__:@n[type=block_display,tag=lg.starter,distance=..250,scores={__starterId__=$(0)}] = compile::inputs[$(0)][$(1)];
-                    } with [$i, $row];
+            if ($nInputs <= $lutInputLimit) {
+                $nInputsMinusOne := $nInputs - 1;
+                execute run {$$nIterations = math::pow2[$(0)]; } with [$nInputs];
+
+                $compileIteration = 0;
+                this.pack_outputs();
+            } else {
+                tellraw @a {color: "red", text: "Input count exceeds LUT limit!"};
+            } 
+        }
+
+        function pack_outputs() {
+            $simulations = 0;
+            for ($iteration = $compileIteration; $iteration < $nIterations && $simulations < $simulationsPerTickLimit; $iteration++) {
+                $simulations++;
+                $compileIteration = $iteration;
+
+                execute as @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] run {
+                    execute run {$__output__:@s := ($iteration / {math::pow2[$(0)]}) % 2;} with [__starterId__:@s];
                 }
-
-                $cycle = 0;
 
                 // Set starting gate bits
                 tag @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] add lg.dirty;
@@ -405,12 +375,6 @@ class zzz_.compile {
                     }
                 }
 
-                if ($cycle >= $idFloodCycleLimit) {
-                    tellraw @a "Circuit exceeded ID flood iteration limit (possible oscillation)";
-                    tag @e[type=block_display,tag=lg.dirty] remove lg.dirty;
-                    scoreboard players reset @e __prevOutput__;
-                }
-
                 execute as @e[type=block_display,tag=lg.output,predicate=mclg:between_points,distance=..250] run {
                     execute run {
                         $compile::outputs[$(0)] << 0;
@@ -418,18 +382,26 @@ class zzz_.compile {
                     } with [__outputId__:@s];
                 }
             }
+            
+            if ($iteration < $nIterations) {
+                $compileIteration++;
+                schedule function this.pack_outputs() 2t;
+                say "moving function to next tick";
+            } else if ($iteration >= $nIterations) {
+                say "finished!";
 
-            execute as @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] run {
-                __starterId__:@s = __bit1__:@s;
+                execute as @e[type=block_display,tag=lg.starter,predicate=mclg:between_points,distance=..250] run {
+                    __starterId__:@s = __bit1__:@s;
+                }
+
+                execute as @e[type=block_display,tag=lg.output,predicate=mclg:between_points,distance=..250] run {
+                    __outputId__:@s = __bit1__:@s;
+                }
+
+                $nInputs = compile::inputs;
+                compile::inputs.del();
+                compile::inputs = $nInputs;
             }
-
-            execute as @e[type=block_display,tag=lg.output,predicate=mclg:between_points,distance=..250] run {
-                __outputId__:@s = __bit1__:@s;
-            }
-
-            $nInputs = compile::inputs;
-            compile::inputs.del();
-            compile::inputs = $nInputs;
         }
 
         function rtm () {
@@ -579,8 +551,7 @@ class zzz_.compile {
                     $max_z = __rtm5__:@s;
 
                     execute at _highlight_ run {
-                        this.make_packed_inputs();
-                        this.make_packed_outputs(); 
+                        this.make_packed_outputs();
                     }
                     
                 }
