@@ -52,12 +52,12 @@ You can create truth tables of circuits to be reused for later with the runtime 
  - Set the outputs using the runtime manager.
  - Select the area you want to use for the truth table.
 This creates the truth table.
-To reuse the truth table, first, give it a name by running `/function mclg:name_truth_table (name:"<name>")`. After this, it's stored with that name, and you can assign it by running `/functoin mclg:assign_truth_table (name:"<name>")`.
+To reuse the truth table, first, give it a name by running `/function mclg:name_truth_table (name:"<name>")`. After this, it's stored with that name, and you can assign it by running `/function mclg:assign_truth_table (name:"<name>")`.
 When assigning, it will prompt you to select your defined inputs and outputs, starting at input 0. Both inputs and outputs ordered from closest to the first point when selecting the area to the farthest.
 
 ## Running Circuits
 Once you've linked your inputs and outputs, you can run them. 
-On your initial starting bits (typically lanterns), run `/function mclg:toggle_starter`. ~~You can also do this in bulk with `execute as <target entities> run function mclg:toggle_starters`~~. 
+On your initial starting bits (typically lanterns), run `/function mclg:toggle_starter`.
 Then, you can use either use the command `/function mclg:id_flood` to run the circuit.
 
 ## Settings
